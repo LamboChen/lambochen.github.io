@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            InfluxDB在Win10安装与简单入门
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:22&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:22
+        </div>
+    </div>
+    <div class="article-content">
+        <h2 id="文前瞎扯"><a href="#文前瞎扯" class="headerlink" title="文前瞎扯"></a>文前瞎扯</h2><blockquote>
+<p>InfluxDB是一个由InfluxData开发的开源时序型数据库[note 1]。它由Go写成，着力于高性能地查询与存储时序型数据。InfluxDB被广泛应用于存储系统的监控数据，IoT行业的实时数据等场景。</p>
+</blockquote>
+<p>引用来自<a href="https://zh.wikipedia.org/wiki/InfluxDB" target="_blank" rel="noopener">维基百科 - InfluxDB</a></p>
+<p>刚接触InfluxDB一段时间，感叹到了作为一个时序数据库的特性，简单易用。虽接触不久，但却勾起了我的强烈兴趣，是一个值得深入研究的数据库。后续也将会深入其底层实现，先打了flag在这 ^ _ ^</p>
+<h2 id="Win10安装"><a href="#Win10安装" class="headerlink" title="Win10安装"></a>Win10安装</h2><p>因为自己平时大多还是用Win10开发，所以学习的过程中也就自然而然的选择安装在了Win10。当然在Linux系统上安装也是相当的简单的。</p>
+<p><strong>1、下载InfluxDB</strong></p>
+<p><a href="https://portal.influxdata.com/downloads" target="_blank" rel="noopener">https://portal.influxdata.com/downloads</a></p>
+<p>下载对应的Windows操作系统的ZIP包即可</p>
+<p><strong>2、安装</strong></p>
+<p>InfluxDB的安装很简单，解压到指定的文件夹就行。</p>
+<p><strong>3、运行InfluxDB</strong></p>
+<p>在解压文件中，有一个influxd.exe的文件，运行其即可（双击或者在cmd中运行均可）。</p>
+<p>在命令行看到InfluxDB的logo打印成功即为InfluxDB启动成功</p>
+<p><strong>4、启动InfluxDB客户端</strong></p>
+<p>运行解压文件夹中的influx.exe文件，即可</p>
+<p>到目前InfluxDB就可以正常使用了。</p>
+<p><strong>5、配置</strong></p>
+<p>根据自己的需要进行相关的配置，以下为我的配置，哈哈</p>
+<p>注：<br>1、“G:/influxdb/influxdb-1.7.0-1”此目录为我的安装目录</p>
+<pre><code>### Welcome to the InfluxDB configuration file.
+
+# The values in this file override the default values used by the system if
+# a config option is not specified. The commented out lines are the configuration
+# field and the default value used. Uncommenting a line and changing the value
+# will change the value used at runtime when the process is restarted.
+
+# Once every 24 hours InfluxDB will report usage data to usage.influxdata.com
+# The data includes a random ID, os, arch, version, the number of series and other
+# usage data. No data from user databases is ever transmitted.
+# Change this option to true to disable reporting.
+reporting-disabled = true
+
+# Bind address to use for the RPC service for backup and restore.
+bind-address = &quot;127.0.0.1:8088&quot;
+
+###
+### [meta]
+###
+### Controls the parameters for the Raft consensus group that stores metadata
+### about the InfluxDB cluster.
+###
+
+[meta]
+  # Where the metadata/raft database is stored
+  dir = &quot;G:/influxdb/influxdb-1.7.0-1/meta&quot;
+
+  # Automatically create a default retention policy when creating a database.
+  # retention-autocreate = true
+
+  # If log messages are printed for the meta service
+  # logging-enabled = true
+
+###
+### [data]
+###
+### Controls where the actual shard data for InfluxDB lives and how it is
+### flushed from the WAL. &quot;dir&quot; may need to be changed to a suitable place
+### for your system, but the WAL settings are an advanced configuration. The
+### defaults should work for most systems.
+###
+
+[data]
+  # The directory where the TSM storage engine stores TSM files.
+  dir = &quot;G:/influxdb/influxdb-1.7.0-1/data&quot;
+
+  # The directory where the TSM storage engine stores WAL files.
+  wal-dir = &quot;G:/influxdb/influxdb-1.7.0-1/wal&quot;
+
+  # The amount of time that a write will wait before fsyncing.  A duration
+  # greater than 0 can be used to batch up multiple fsync calls.  This is useful for slower
+  # disks or when WAL write contention is seen.  A value of 0s fsyncs every write to the WAL.
+  # Values in the range of 0-100ms are recommended for non-SSD disks.
+  # wal-fsync-delay = &quot;0s&quot;
+
+
+  # The type of shard index to use for new shards.  The default is an in-memory index that is
+  # recreated at startup.  A value of &quot;tsi1&quot; will use a disk based index that supports higher
+  # cardinality datasets.
+  # index-version = &quot;inmem&quot;
+
+  # Trace logging provides more verbose output around the tsm engine. Turning
+  # this on can provide more useful output for debugging tsm engine issues.
+  # trace-logging-enabled = false
+
+  # Whether queries should be logged before execution. Very useful for troubleshooting, but will
+  # log any sensitive data contained within a query.
+  query-log-enabled = true
+</code></pre><pre><code>[retention]
+  # Determines whether retention policy enforcement enabled.
+  enabled = true
+
+  # The interval of time when retention policy enforcement checks run.
+  check-interval = &quot;30m&quot;
+
+###
+### [shard-precreation]
+###
+### Controls the precreation of shards, so they are available before data arrives.
+### Only shards that, after creation, will have both a start- and end-time in the
+### future, will ever be created. Shards are never precreated that would be wholly
+### or partially in the past.
+
+[shard-precreation]
+  # Determines whether shard pre-creation service is enabled.
+  enabled = true
+
+  # The interval of time when the check to pre-create new shards runs.
+  check-interval = &quot;10m&quot;
+
+  # The default period ahead of the endtime of a shard group that its successor
+  # group is created.
+  advance-period = &quot;30m&quot;
+
+###
+### Controls the system self-monitoring, statistics and diagnostics.
+###
+### The internal database for monitoring data is created automatically if
+### if it does not already exist. The target retention within this database
+### is called &#39;monitor&#39; and is also created with a retention period of 7 days
+### and a replication factor of 1, if it does not exist. In all cases the
+### this retention policy is configured as the default for the database.
+
+[monitor]
+  # Whether to record statistics internally.
+  store-enabled = true
+
+  # The destination database for recorded statistics
+  store-database = &quot;_internal&quot;
+
+  # The interval at which to record statistics
+  store-interval = &quot;10s&quot;
+
+###
+### [http]
+###
+### Controls how the HTTP endpoints are configured. These are the primary
+### mechanism for getting data into and out of InfluxDB.
+###
+
+[http]
+  # Determines whether HTTP endpoint is enabled.
+  enabled = true
+
+  # Determines whether the Flux query endpoint is enabled.
+  flux-enabled = false
+
+  # The bind address used by the HTTP service.
+  bind-address = &quot;:8086&quot;
+
+  # Determines whether user authentication is enabled over HTTP/HTTPS.
+  # auth-enabled = false
+
+  # The default realm sent back when issuing a basic auth challenge.
+  # realm = &quot;InfluxDB&quot;
+
+  # Determines whether HTTP request logging is enabled.
+  # log-enabled = true
+
+  # Determines whether the HTTP write request logs should be suppressed when the log is enabled.
+  # suppress-write-log = false</code></pre><h2 id="极速入门"><a href="#极速入门" class="headerlink" title="极速入门"></a>极速入门</h2><p>学习过数据库、MySQL、Oracle的读者，应该说入门InfluxDB就是半个小时的事儿，主要看下文档，（文末附有链接）。我这里主要贴下其几个与关系型数据库关联的名词</p>
+<blockquote>
+<p>InfluxDB的measurement(foodships)和SQL数据库里的table类似；<br>InfluxDB的tag(park_id和planet)类似于SQL数据库里索引的列；<br>InfluxDB中的field(#_foodships)类似于SQL数据库里没有索引的列；<br>InfluxDB里面的数据点(例如2015-04-16T12:00:00Z 5)类似于SQL数据库的行；</p>
+</blockquote>
+<h2 id="友情链接"><a href="#友情链接" class="headerlink" title="友情链接"></a>友情链接</h2><p><a href="https://zh.wikipedia.org/wiki/InfluxDB" target="_blank" rel="noopener">1、InfluxDB - 维基百科 </a><br><a href="https://www.linuxdaxue.com/install-and-use-influxdb-in-windows.html" target="_blank" rel="noopener">2、InfluxDB在windows下的安装和配置 - Linux大学</a><br><a href="https://jasper-zhang1.gitbooks.io/influxdb/content/" target="_blank" rel="noopener">3、InfluxDB中文文档 - GitBook</a><br><a href="https://cn.aliyun.com/jiaocheng/topic_23928.html" target="_blank" rel="noopener">4、InfluxDB - 教程中心 - 阿里云</a><br><a href="https://github.com/influxdata/influxdb" target="_blank" rel="noopener">5、InfluxDB - GitHub</a><br><a href="https://www.cnblogs.com/MikeZhang/p/InfluxDBInstall20170206.html" target="_blank" rel="noopener">6、InfluxDB安装与配置（Linux） -  博客园</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
