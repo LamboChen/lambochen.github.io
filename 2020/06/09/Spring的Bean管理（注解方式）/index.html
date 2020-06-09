@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Spring的Bean管理（注解方式）
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:46&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:47
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79160772" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79160772</a></p>
+<h2 id="注解介绍"><a href="#注解介绍" class="headerlink" title="注解介绍"></a>注解介绍</h2><ul>
+<li>1、代码中特殊的标记，使用注解可以完成功能</li>
+<li>2、注解写法  @注解名称（属性名称=属性值）</li>
+<li>3、注解可以用于类、方法、属性上</li>
+</ul>
+<h2 id="Spring的Bean管理（注解方式）"><a href="#Spring的Bean管理（注解方式）" class="headerlink" title="Spring的Bean管理（注解方式）"></a>Spring的Bean管理（注解方式）</h2><p><strong>Spring注解开发准备：</strong></p>
+<p>1、导入jar包</p>
+<ul>
+<li>1）导入基本jar包</li>
+<li>2）导入aop的jar包</li>
+</ul>
+<p>2、创建类、方法</p>
+<pre><code>public class User {
+
+    public void add(){
+        System.out.println(&quot;add()..........&quot;);
+    }
+
+}</code></pre><pre><code>public class UserService {
+
+    private UserDao userDao;
+
+    public void add(){
+        System.out.println(&quot;service add()........&quot;);
+    }
+}</code></pre><p>3、创建applicationContext.xml配置文件，引入约束</p>
+<ul>
+<li>1）aop基本功能，引入约束beans</li>
+<li>2）spring的ioc注解开发，引入相关约束（XXX/spring-context.xsd）</li>
+</ul>
+<p>4、开启注解扫描</p>
+<p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;!--
+        开启注解扫描
+        到包中扫描类、方法、属性上是否有注解
+--&gt;
+&lt;context:component-scan base-package=&quot;demo.spring.annotation&quot;&gt;&lt;/context:component-scan&gt;
+
+&lt;!--
+        扫描属性上的注解(不常用）
+        --&gt;
+&lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+</code></pre><p><strong>注解创建对象：</strong></p>
+<p>1、在创建对象的类上面使用注解实现</p>
+<pre><code>@Component(value = &quot;user&quot;)      //相当于 &lt;bean id=&quot;user&quot; class=&quot;User全路径&quot;/&gt;
+public class User {
+    public void add(){
+        System.out.println(&quot;add()..........&quot;);
+    }
+}</code></pre><p>2、创建对象有四个注解</p>
+<p>官方文档中：</p>
+<pre><code>Spring中提供@Component的三个衍生注解：（功能目前来讲是一致的）
+ - @Controller      web层
+ - @Service         业务层
+ - @Repository      持久层
+这三个注解是为了让标注类本身的用途清晰，Spring在后续版本会对其增强</code></pre><ul>
+<li>1）@component</li>
+<li>2）@Controller</li>
+<li>3）@Service</li>
+<li>4）@Repository</li>
+</ul>
+<p>目前四个注解功能都是创建对象</p>
+<p>3、创建对象是单实例还是多实例</p>
+<pre><code>@Component(value = &quot;user&quot;)      //相当于 &lt;bean id=&quot;user&quot; class=&quot;User全路径&quot;/&gt;
+@Scope(value = &quot;prototype&quot;)     //默认是单实例
+public class User {
+    public void add(){
+        System.out.println(&quot;add()..........&quot;);
+    }
+}</code></pre><h2 id="注解注入属性："><a href="#注解注入属性：" class="headerlink" title="注解注入属性："></a>注解注入属性：</h2><p>创建service类，创建dao类，在service得到dao对象<br>注入属性第一个注解 <font color="red">@Autowired</font></p>
+<p>Dao类：</p>
+<pre><code>@Component(value = &quot;userDao&quot;)
+public class UserDao {
+
+    public void add(){
+        System.out.println(&quot;dao add()......&quot;);
+    }
+}</code></pre><p>Service类：</p>
+<pre><code>@Component(value = &quot;userService&quot;)
+public class UserService {
+
+    //得到dao对象
+    //1、定义dao类型属性
+    //在dao属性上面使用注解，完成对象注入
+    @Autowired
+    private UserDao userDao;
+    //使用注解方式不需要set方法
+
+    public void add(){
+        System.out.println(&quot;service add()........&quot;);
+    }
+}</code></pre><p>注入属性第二个注解 <font color="red">@Resource</font></p>
+<pre><code>//    name 属性值写注解创建dao对象value值
+    @Resource(name = &quot;userDao&quot;)
+    private UserDao userDao;</code></pre><p><strong>常用掌握：</strong></p>
+<p>创建对象用XML配置文件方式，注入属性用注解方式</p>
+<p><strong>注：</strong></p>
+<p>本文是我学习笔记总结，不足之处，还望指正。</p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
