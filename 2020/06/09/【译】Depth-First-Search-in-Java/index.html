@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【译】Depth First Search in Java
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:32&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:33
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家：<a href="https://blog.csdn.net/chensanwa/article/details/100187403" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/100187403</a></p>
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h1><p>在本教程中，我们将探讨Java中的深度优先搜索</p>
+<p>深度优先搜索（DFS）是一个应用于树、图等数据结构的遍历算法。在移动到下一个分支之前，深度优先搜索会<br>深度为优先原则去探索新的分支。</p>
+<p>在接下来的部分中，我们将首先了解树的实现，然后是图。</p>
+<p>要了解如何在Java中实现这些结构，请查看我们以前的关于 <a href="https://www.baeldung.com/java-binary-tree" target="_blank" rel="noopener">二叉树 Binary Tree</a> 和 <a href="https://www.baeldung.com/java-graphs" target="_blank" rel="noopener">图 Graph</a> 的教程。</p>
+<h1 id="2-树的深度优先搜索"><a href="#2-树的深度优先搜索" class="headerlink" title="2. 树的深度优先搜索"></a>2. 树的深度优先搜索</h1><p>使用 DFS 遍历树有三种不同的顺序：</p>
+<ul>
+<li>先序遍历</li>
+<li>中序遍历</li>
+<li>后序遍历</li>
+</ul>
+<h2 id="2-1-先序遍历"><a href="#2-1-先序遍历" class="headerlink" title="2.1 先序遍历"></a>2.1 先序遍历</h2><p>在先序遍历中，先遍历其根节点，依次是左子树和右子树。</p>
+<p>使用递归简单地实现先序遍历：</p>
+<ul>
+<li>访问当前节点</li>
+<li>遍历左子树</li>
+<li>遍历右子树</li>
+</ul>
+<pre><code class="java">public void traversePreOrder(Node node) {
+    if (node != null) {
+        visit(node.value);
+        traversePreOrder(node.left);
+        traversePreOrder(node.right);
+    }
+}</code></pre>
+<p>使用非递归方式实现先序遍历：</p>
+<ul>
+<li>将根节点入栈</li>
+<li>当栈不为空<ul>
+<li>将当前节点（栈顶元素）弹栈</li>
+<li>访问当前节点</li>
+<li>依次将当前节点右子节点、左子节点入栈</li>
+</ul>
+</li>
+</ul>
+<pre><code class="java">public void traversePreOrderWithoutRecursion() {
+    Stack&lt;Node&gt; stack = new Stack&lt;Node&gt;();
+    Node current = root;
+    stack.push(root);
+    while(!stack.isEmpty()) {
+        current = stack.pop();
+        visit(current.value);
+
+        if(current.right != null) {
+            stack.push(current.right);
+        }    
+        if(current.left != null) {
+            stack.push(current.left);
+        }
+    }        
+}</code></pre>
+<h2 id="2-2-中序遍历"><a href="#2-2-中序遍历" class="headerlink" title="2.2 中序遍历"></a>2.2 中序遍历</h2><p>对于中序遍历，先访问其左子树，然后根节点，最后访问右子树。</p>
+<p>二叉搜索树的中序遍历意味着按值的递增顺序遍历节点。</p>
+<p>使用递归实现中序遍历：</p>
+<pre><code class="java">public void traverseInOrder(Node node) {
+    if (node != null) {
+        traverseInOrder(node.left);
+        visit(node.value);
+        traverseInOrder(node.right);
+    }
+}</code></pre>
+<p>同时也可以使用非递归实现中序遍历：</p>
+<ul>
+<li>将根节点压栈</li>
+<li>当栈不为空<ul>
+<li>继续将左子节点压栈，直到当前节点为最左节点（即无左子节点）</li>
+<li>访问当前节点</li>
+<li>将右子节点压栈</li>
+</ul>
+</li>
+</ul>
+<pre><code class="java">public void traverseInOrderWithoutRecursion() {
+    Stack&lt;Node&gt; stack = new Stack&lt;Node&gt;();
+    Node current = root;
+    stack.push(root);
+    while(! stack.isEmpty()) {
+        while(current.left != null) {
+            current = current.left;                
+            stack.push(current);                
+        }
+        current = stack.pop();
+        visit(current.value);
+        if(current.right != null) {
+            current = current.right;                
+            stack.push(current);
+        }
+    }
+}</code></pre>
+<h2 id="2-3-后序遍历"><a href="#2-3-后序遍历" class="headerlink" title="2.3 后序遍历"></a>2.3 后序遍历</h2><p>最后，在后序遍历中，在访问根节点之前，依次先访问左子节点、右子节点。</p>
+<p>参考前边，递归实现后序遍历：</p>
+<pre><code class="java">public void traversePostOrder(Node node) {
+    if (node != null) {
+        traversePostOrder(node.left);
+        traversePostOrder(node.right);
+        visit(node.value);
+    }
+}</code></pre>
+<p>使用非递归实现后序遍历：</p>
+<ul>
+<li>将根节点入栈</li>
+<li>当栈不为空<ul>
+<li>检查是否已经遍历了左子树和右子树</li>
+<li>如果没有，则将右子节点和左子节点压栈</li>
+</ul>
+</li>
+</ul>
+<pre><code class="java">public void traversePostOrderWithoutRecursion() {
+    Stack&lt;Node&gt; stack = new Stack&lt;Node&gt;();
+    Node prev = root;
+    Node current = root;
+    stack.push(root);
+
+    while (!stack.isEmpty()) {
+        current = stack.peek();
+        boolean hasChild = (current.left != null || current.right != null);
+        boolean isPrevLastChild = (prev == current.right || 
+          (prev == current.left &amp;&amp; current.right == null));
+
+        if (!hasChild || isPrevLastChild) {
+            current = stack.pop();
+            visit(current.value);
+            prev = current;
+        } else {
+            if (current.right != null) {
+                stack.push(current.right);
+            }
+            if (current.left != null) {
+                stack.push(current.left);
+            }
+        }
+    }   
+}</code></pre>
+<h1 id="3-图的深度优先搜索"><a href="#3-图的深度优先搜索" class="headerlink" title="3. 图的深度优先搜索"></a>3. 图的深度优先搜索</h1><p>图和树之间的主要区别在于图可能包含循环。</p>
+<p>因此，为了避免循环搜索，我们将在访问每个节点时对其进行标记。</p>
+<p>接下来将会展示图DFS的递归、非递归实现。</p>
+<h2 id="3-1-图的DFS递归实现"><a href="#3-1-图的DFS递归实现" class="headerlink" title="3.1 图的DFS递归实现"></a>3.1 图的DFS递归实现</h2><p>首先，让我们从递归开始：</p>
+<ul>
+<li>从一个任意的节点开始</li>
+<li>标记当前节点为已访问</li>
+<li>访问当前节点</li>
+<li>遍历未访问的相邻节点</li>
+</ul>
+<pre><code class="java">public void dfs(int start) {
+    boolean[] isVisited = new boolean[adjVertices.size()];
+    dfsRecursive(start, isVisited);
+}
+
+private void dfsRecursive(int current, boolean[] isVisited) {
+    isVisited[current] = true;
+    visit(current);
+    for (int dest : adjVertices.get(current)) {
+        if (!isVisited[dest])
+            dfsRecursive(dest, isVisited);
+    }
+}</code></pre>
+<h2 id="3-2-图的DFS非递归实现"><a href="#3-2-图的DFS非递归实现" class="headerlink" title="3.2 图的DFS非递归实现"></a>3.2 图的DFS非递归实现</h2><p>也可以在不使用递归的情况下实现图的DFS。我们也需要使用一个栈进行实现：</p>
+<ul>
+<li>将从一个任意的节点开始</li>
+<li>将节点压栈</li>
+<li>当栈不为空<ul>
+<li>标记当前节点为已访问</li>
+<li>访问当前节点</li>
+<li>将未访问的相邻顶点压栈</li>
+</ul>
+</li>
+</ul>
+<pre><code class="java">public void dfsWithoutRecursion(int start) {
+    Stack&lt;Integer&gt; stack = new Stack&lt;Integer&gt;();
+    boolean[] isVisited = new boolean[adjVertices.size()];
+    stack.push(start);
+    while (!stack.isEmpty()) {
+        int current = stack.pop();
+        isVisited[current] = true;
+        visit(current);
+        for (int dest : adjVertices.get(current)) {
+            if (!isVisited[dest])
+                stack.push(dest);
+        }
+    }
+}</code></pre>
+<h2 id="3-4-拓扑排序"><a href="#3-4-拓扑排序" class="headerlink" title="3.4 拓扑排序"></a>3.4 拓扑排序</h2><p>图的深度优先搜索有很多应用。拓扑排序是深度优先搜索最著名的应用之一。</p>
+<p>有向图的拓扑排序是其顶点的线性排序，因此对于每个边，源节点都位于目标之前。</p>
+<p>要进行拓扑排序，需要对刚刚实现的DFS进行简单的改造：</p>
+<ul>
+<li>我们需要将访问的顶点保持在堆栈中，因为拓扑排序是以相反的顺序访问的顶点</li>
+<li>只有在遍历所有相邻节点之后，才会将访问的节点推送到堆栈中。</li>
+</ul>
+<pre><code class="java">public List&lt;Integer&gt; topologicalSort(int start) {
+    LinkedList&lt;Integer&gt; result = new LinkedList&lt;Integer&gt;();
+    boolean[] isVisited = new boolean[adjVertices.size()];
+    topologicalSortRecursive(start, isVisited, result);
+    return result;
+}
+
+private void topologicalSortRecursive(int current, boolean[] isVisited, LinkedList&lt;Integer&gt; result) {
+    isVisited[current] = true;
+    for (int dest : adjVertices.get(current)) {
+        if (!isVisited[dest])
+            topologicalSortRecursive(dest, isVisited, result);
+    }
+    result.addFirst(current);
+}</code></pre>
+<h1 id="4-结论"><a href="#4-结论" class="headerlink" title="4. 结论"></a>4. 结论</h1><p>在本文中，我们讨论了树和图的深度优先搜索。</p>
+<p>完整代码见 <a href="https://github.com/eugenp/tutorials/tree/master/data-structures" target="_blank" rel="noopener">GitHub</a> 。</p>
+<blockquote>
+<p>原文：<a href="https://www.baeldung.com/java-depth-first-search" target="_blank" rel="noopener">https://www.baeldung.com/java-depth-first-search</a><br>作者：baeldung<br>译者：陈苓洪</p>
+</blockquote>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
