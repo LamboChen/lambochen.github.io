@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Intellij IDEA创建Spring项目之基于Aspectj的AOP操作(注解方式）
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:53&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:53
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79166926" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79166926</a></p>
+<p><strong>前言：</strong></p>
+<ul>
+<li>本文采用注解的方式进行Spring中基于Aspectj的AOP操作。</li>
+<li>且此文是在已经了解了Spring中基于Aspectj的AOP操作原理的基础上，再利用IDEA创建项目</li>
+<li>如需了解使用XML配置文件的方式，请移步<a href="http://blog.csdn.net/chensanwa/article/details/79165528" target="_blank" rel="noopener">Intellij   IDEA创建Spring项目之基于Aspectj的AOP操作</a></li>
+<li>本文采用创建项目的形式讲解，并非讲AOP原理</li>
+</ul>
+<p><strong>环境：</strong></p>
+<ul>
+<li>Intellij IDEA 2017 CI</li>
+</ul>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p><strong>1、创建项目</strong></p>
+<p>创建项目如图：</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MjExODUyNTUz?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>Book类：</p>
+<pre><code>package demo.spring.aop;
+
+public class Book {
+
+    public void add(){
+        System.out.println(&quot;Book-add()........&quot;);
+    }
+}</code></pre><p>MyBook类：</p>
+<pre><code>package demo.spring.aop;
+
+public class MyBook {
+
+
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+
+&lt;/beans&gt;</code></pre><p>TestAop类：</p>
+<pre><code>package demo.spring.aop;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestAop {
+
+    @Test
+    public void test(){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Book book = (Book) applicationContext.getBean(&quot;book&quot;);
+        book.add();
+    }
+}</code></pre><p>注：如不了解具体的创建步骤，请猛点<a href="http://blog.csdn.net/chensanwa/article/details/79165528" target="_blank" rel="noopener">Intellij   IDEA创建Spring项目之基于Aspectj的AOP操作</a></p>
+<p><strong>2、配置applicationContext.xml配置文件</strong></p>
+<p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+    &lt;!--注解方式--&gt;
+    &lt;aop:aspectj-autoproxy&gt;&lt;/aop:aspectj-autoproxy&gt;
+
+    &lt;!--创建对象--&gt;
+    &lt;bean id=&quot;book&quot; class=&quot;demo.spring.aop.Book&quot;&gt;&lt;/bean&gt;
+    &lt;bean id=&quot;myBook&quot; class=&quot;demo.spring.aop.MyBook&quot;&gt;&lt;/bean&gt;
+&lt;/beans&gt;</code></pre><p><strong>3、配置切面</strong></p>
+<p>MyBook类：</p>
+<pre><code>package demo.spring.aop;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect
+public class MyBook {
+
+    //前置增强
+    @Before(value = &quot;execution(* demo.spring.aop.Book.*(..))&quot;)
+    public void before(){
+        System.out.println(&quot;前置增强........&quot;);
+    }
+
+    //后置增强
+    @AfterReturning(value = &quot;execution(* demo.spring.aop.Book.*(..))&quot;)
+    public void after(){
+        System.out.println(&quot;后置增强........&quot;);
+    }
+
+    //环绕增强
+    @Around(value = &quot;execution(* demo.spring.aop.Book.*(..))&quot;)
+    public void arround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        //方法之前执行的代码
+        System.out.println(&quot;环绕增强 方法之前执行........&quot;);
+
+        //执行被增强的方法
+        proceedingJoinPoint.proceed();
+
+        //方法之后执行的代码
+        System.out.println(&quot;环绕增强 方法之后执行........&quot;);
+    }
+}
+</code></pre><p><strong>4、测试</strong></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MjEzMDQyOTk3?x-oss-process=image/format,png" alt="这里写图片描述"><br>测试成功</p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
