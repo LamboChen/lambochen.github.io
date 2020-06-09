@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Java注解学习笔记
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:28&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:31
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/78980043" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/78980043</a></p>
+<p>本文为学习Java注解视频（<a href="https://www.imooc.com/learn/456" target="_blank" rel="noopener">全面解析Java注解</a>）时所写笔记，不足之处，欢迎指正</p>
+<p><strong>概念：</strong><br>Java提供了一种原程序中的元素关联任何信息和任何元数据的途径和方法</p>
+<p><strong>分类：</strong><br><em>按照运行机制</em></p>
+<p>1、源码注解（注解只在源码中存在，编译成.class文件就不存在了）<br>2、编译时注解（注解在源码和.class文件中都存在）<br>3、运行时注解（在运行阶段还起作用，甚至会影响运行逻辑的注解）</p>
+<p><em>按照来源分</em></p>
+<p>1、来自JDK的注解<br>2、来自第三方的注解<br>3、自定义注解<br>元注解：注解的注解</p>
+<p><strong>自定义注解：</strong></p>
+<p>语法要求</p>
+<pre><code class="java">/**
+ * 原注解的作用域
+ * CONSTRUCTOR：构造方法声明，
+ * FIELD：字段声明 ，
+ * LOCAL_VARIABLE：局部变量声明，
+ * METHOD：方法声明，
+ * PACKAGE：包声明，
+ * PARAMETER：参数声明，
+ * TYPE：类、接口）
+ **/
+@Target({ElementType.METHOD,ElementType.TYPE})
+
+/**
+ * 元注解的声明周期
+ * SOURCE：只在源码显示，编译时会丢弃  
+ * CLASS：编译时会记录到class中，运行时忽略   
+ * RUNTIME：运行时存在，可以通过反射读取）
+ */
+@Retantion(RetentionPolicy.RUNTIME)
+
+/*标识性的元注解（允许子类继承）*/
+@Inherited
+
+/*生成Javadoc时会包含注解*/
+@Documented
+
+//使用@interface关键字定义注解
+public @interface Description{    
+    String desc();    //成员以无参无异常的方式声明
+    int age() default 18;        //可以用default为成员指定一个默认值
+    /** 
+     * 1、成员类型是受限的，合法的类型包括原始类型及String、Class、Annotation、Enumeration
+     * 2、如果注解只有一个成员，则成员名必须取名为value（），在使用时可以忽略成员名和赋值号（=）
+     * 3、注解类可以没有成员，没有成员的注解称为标识注解
+     **/
+}</code></pre>
+<p><strong>使用自定义注解：</strong><br>使用语法：@&lt;注解名&gt;(&lt;成员名1&gt;=&lt;成员值1&gt;,&lt;成员名2&gt;=&lt;成员值2&gt;,…)</p>
+<pre><code class="java">实例：
+@Description（desc=&quot;I am eysColor&quot;,author=&quot;Mooc boy&quot;,age=18)
+public String eyeColor(){
+    return &quot;red:&quot;
+}</code></pre>
+<p><strong>解析注解：</strong><br>概念：通过反射获取类、函数或成员上的运行时注解信息，从而实现动态控制程序运行的逻辑</p>
+<pre><code class="java">public static void main(String [] args){
+    //1、使用类加载器加载类
+    try{
+        Class c = Class.forName(&quot;Com.Child&quot;);        //完整类名
+        //2、找到类上的注解
+        boolean isExist = c.isAnnotationPresent(Description.Class);
+        if(isExist){
+            //3、拿到注解实例
+            Description d = (Description) c.getAnnotation(Description.class);
+            System.out.println(d.value());
+        }
+        //4、找到方法上的注解
+        Method[] ms = c.getMethods();
+        for(Method m : ms){
+            boolean isMExist = m.isAnnotationPresent(Description.class);
+            if(isMExist){
+                Description d = (Description) m.getAnnotation(Description.class);
+                System.out.println(d.value());
+            }
+        }
+
+        //另外一种解析方法
+        for(Method m : ms){
+            Annotation[] as = m.getAnnotation();
+            for(Annotation a : as){
+                if(a instanceof Description){
+                    Description d = (Description) a;
+                    System.out.println(d.value());
+                }
+            }
+        }
+    } catch(ClassNotFoundException e){
+        e.printStackTrace();
+    }
+}</code></pre>
+<p>友情链接：</p>
+<ul>
+<li><a href="http://www.importnew.com/10294.html" target="_blank" rel="noopener">Java中的注解是如何工作的？</a></li>
+<li><a href="https://www.cnblogs.com/austinspark-jessylu/p/6374546.html" target="_blank" rel="noopener">java 注解的几大作用及使用方法详解</a></li>
+<li><a href="https://www.zhihu.com/question/36486629" target="_blank" rel="noopener">怎样优雅地使用java注解？</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
