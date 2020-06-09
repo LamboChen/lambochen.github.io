@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【Linux】初入Ubuntu的Java开发者安装软件手记
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:19&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:20
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/83144546" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/83144546</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在几个月前终于从蓝屏系统转战Ubuntu，前前后后也装了很多次的Ubuntu，以及相关的开发软件，为节省以后再次重装系统、软件所花费的查资料的时间，特写一文记录下我常用的软件的安装。</p>
+<h2 id="Ubuntu安装"><a href="#Ubuntu安装" class="headerlink" title="Ubuntu安装"></a>Ubuntu安装</h2><p>初入系统，第一步肯定是安装Ubuntu的啦，我采用的是在我固态上切割了两个分区，一个分区装Windows，另一个装Ubuntu。安装双系统需要注意的是，尽量先安装Windows，将待安装的分区直接删除，然后再安装Ubuntu，避免出现Ubuntu引导出问题。（当然，先装Ubuntu也是可以的，如果引导出现了问题，可能就需要配置下，所以这种方式对于新手不是很友好）</p>
+<p><strong>启动U盘制作</strong></p>
+<p>我一般装系统都是采用启动U盘进行安装，这里推荐 <a href="https://rufus.ie/en_IE.html" target="_blank" rel="noopener">Rufus</a></p>
+<p>对于OS 镜像，均可到相应官网下载。</p>
+<p>我常用下载链接 Windows：<a href="http://msdn.itellyou.cn/" target="_blank" rel="noopener">MSDN，I tell you</a> , Ubuntu : <a href="https://www.ubuntu.com/index_kylin" target="_blank" rel="noopener">Ubuntu官网</a></p>
+<p><strong>U盘安装</strong></p>
+<p>进入BIOS直接点击U盘启动安装即可，后边就 next 到底，很傻瓜。</p>
+<p>进入BIOS每个电脑型号可能按键不一样，绝大部分电脑支持直接点击 esc 键进入启动选项，点击U盘启动即可。</p>
+<h2 id="更新源"><a href="#更新源" class="headerlink" title="更新源"></a>更新源</h2><p>在国内，使用Ubuntu提供的源，可以说是相当难受了，一般切换为国内的下载源</p>
+<p>1、备份source.list</p>
+<pre><code># cp /etc/apt/source.list /etc/apt/source.list.bak</code></pre><p>2、删除source.list文件全部内容</p>
+<pre><code># vim /etc/apt/sources.list
+可以先将光标滚动到文件末尾使用命令
+:1,.d
+即删除从第一行到当前行，清空文件内容，然后 :wq 保存
+&quot;.&quot;当前行 ，&quot;1,.&quot;表示从第一行到当前行 ，&quot;d&quot;删除</code></pre><p>3、添加source.list内容为国内的源</p>
+<p>1) <a href="https://mirror.tuna.tsinghua.edu.cn/help/ubuntu/" target="_blank" rel="noopener">清华大学Ubuntu镜像</a><br>2) <a href="https://opsx.alibaba.com/mirror" target="_blank" rel="noopener">阿里巴巴开元镜像站</a><br>3) <a href="https://mirrors.163.com/" target="_blank" rel="noopener">网易开源镜像站</a><br>。。。（其他镜像站见参考文章）</p>
+<p>4、执行update</p>
+<pre><code># sudo apt-get update</code></pre><h2 id="卸载不喜欢的APP"><a href="#卸载不喜欢的APP" class="headerlink" title="卸载不喜欢的APP"></a>卸载不喜欢的APP</h2><p>作为一个追求极客精神的developer来说，都已经从蓝屏系统来到了Linux领域了，肯定是有一定的个人喜好的啦。我就不喜欢在电脑上装一些暂时用不到的软件，我觉得碍着我的眼了 ^ _ ^</p>
+<p>简单点，直接打开Ubuntu软件，移除不用的APP即可</p>
+<p>也可以直接通过命令进行卸载，先查找相关系统装了哪些软件，进行移除即可</p>
+<h2 id="常用软件安装"><a href="#常用软件安装" class="headerlink" title="常用软件安装"></a>常用软件安装</h2><p><strong>一、搜狗输入法</strong></p>
+<p>在Ubuntu，系统自带的输入法，可以说很难用了，我一直常用的还是搜狗输入法，真心好用，强力安利。</p>
+<p>1、下载输入法</p>
+<p><a href="https://pinyin.sogou.com/linux/?r=pinyin" target="_blank" rel="noopener">https://pinyin.sogou.com/linux/?r=pinyin</a></p>
+<p>2、更新源和相关依赖</p>
+<pre><code># sudo apt-get update
+# sudo apt-get install -f</code></pre><p>3、安装</p>
+<pre><code># sudo dpkg -i sogoupinyin_2.0.0.0072_amd64.deb（deb文件名，要和自己下载的版本一致）</code></pre><p>4、fcitx 问题</p>
+<p>可能会报fcitx相关错误，可以直接运行Ubuntu系统的解决方案的命令，然后重新执行安装输入法命令即可</p>
+<p>如果还没有解决，就自行Google吧</p>
+<p><strong>二、网易云音乐</strong></p>
+<p>作为一个码农来说，平时听听音乐应该是很正常的事儿吧。</p>
+<p>1、下载网易云音乐</p>
+<p>官网下载Linux版本 <a href="https://music.163.com/" target="_blank" rel="noopener">https://music.163.com/</a></p>
+<p>2、安装</p>
+<pre><code># sudo dpkg -i netease-cloud-music_1.0.0_i386_ubuntu16.04.deb （此处为下载的具体文件名）</code></pre><p>3、修复并自动安装所需依赖</p>
+<p>一般在安装的时候，都会说缺少依赖</p>
+<pre><code># sudo apt-get install -f</code></pre><p>4、再次执行安装命令</p>
+<pre><code># sudo dpkg -i netease-cloud-music_1.0.0_i386_ubuntu16.04.deb （此处为下载的具体文件名）</code></pre><p>5、启动</p>
+<p>如果不出意外，应该就可以启动,可通过搜索启动，也可通过直接输入命令netease-cloud-music启动</p>
+<p>6、修复无法启动</p>
+<p>果不其然，我还是出了意外，没有能够正常启动</p>
+<p>在文件/usr/share/applications/netease-cloud-music.desktop中，在%U 前面添加–no-sandbox 即可解决</p>
+<p>最好reboot后再次启动</p>
+<p>如果重启后还是无法启动，可参考<a href="https://blog.csdn.net/weixin_31317775/article/details/78726460" target="_blank" rel="noopener">Ubuntu 16.04 安装网易云音乐 无法启动的问题</a></p>
+<p><strong>三、git</strong></p>
+<p>Ubuntu的git安装就很方便了</p>
+<pre><code># sudo apt-get install git</code></pre><p> <strong>四、vim</strong></p>
+<p>同样的，喜欢用vim而不是gedit的我，肯定还是要安装vim的卅</p>
+<pre><code>sudo apt-get install vim</code></pre><p> <strong>五、Google Chrome</strong></p>
+<p>首选浏览器好吧。我直接采用命令安装</p>
+<pre><code># sudo wget https://repo.fdzh.org/chrome/google-chrome.list -P /etc/apt/sources.list.d/
+
+# wget -q -O - https://dl.google.com/linux/linux_signing_key.pub  | sudo apt-key add -
+
+# sudo apt-get update
+
+# sudo apt-get install google-chrome-stable
+
+启动：
+# google-chrome-stable
+</code></pre><h2 id="开发相关"><a href="#开发相关" class="headerlink" title="开发相关"></a>开发相关</h2><p><strong>一、JDK、JRE</strong></p>
+<p>1、下载</p>
+<p>JDK ： <a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a></p>
+<p>JRE ：<a href="https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html</a></p>
+<p>一般我都是直接下载两个，而不是采用JDK中的JRE，这个看自己吧。</p>
+<p>2、解压缩</p>
+<p>看网上很多都推荐安装到 /usr/local目录下，为归档好看点，我在local目录下新建Java目录</p>
+<pre><code># sudo mv jdk_file.tar.gz /usr/local/java/
+# sudo mv jre_file.tar.gz /usr/local/java/
+
+进入Java目录
+# cd /usr/local/java/
+
+解压缩：
+# sudo tar -zxvf jdk_file.tar.gz
+# sudo tar -zxvf jre_file.tar.gz</code></pre><p>3、配置环境变量</p>
+<pre><code># sudo vim ~/.bashrc
+
+在文件添加：
+# export JAVA_HOME=/usr/local/java/jdk_file
+# export JRE_HOME=/usr/local/java/jre_file
+# export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+# export PATH=${JAVA_HOME}/bin:${PATH}</code></pre><p>4、检查配置</p>
+<pre><code># source ~/.bashrc
+# java -version</code></pre><p>显示Java信息即为配置成功</p>
+<p><strong>二、maven</strong></p>
+<p>本文讲解通过二进制包（.tar.gz）安装</p>
+<p>1、下载合适版本</p>
+<p><a href="https://maven.apache.org/download.cgi" target="_blank" rel="noopener">https://maven.apache.org/download.cgi</a></p>
+<p>2、移动至安装目录、解压</p>
+<pre><code># sudo mv maven_file.tar.gz /usr/local/java
+# cd /usr/local/java/
+# sudo tar -zxvf maven_file.tar.gz</code></pre><p>3、配置环境变量</p>
+<pre><code># sudo vim ~/.bashrc
+
+如果要配置系统级别的环境变量，则应该编辑以下文件:
+# sudo vim /etc/profile</code></pre><pre><code># export M2_HOME=/usr/local/java/maven_file
+# export M2=${M2_HOME}/bin
+# export PATH=${M2}:${PATH}</code></pre><p>4、刷新环境变量</p>
+<pre><code># source ~/.bashrc</code></pre><p>5、测试</p>
+<pre><code># mvn -version</code></pre><p><strong>三、IDE</strong></p>
+<p>IDE：Intellij IDEA 、PyCharm、WebStrom</p>
+<p>安装都是一样的步骤，就以Intellij IDEA为例</p>
+<p>1、下载安装包</p>
+<p>Intellij IDEA : <a href="https://www.jetbrains.com/idea/download/#section=linux" target="_blank" rel="noopener">https://www.jetbrains.com/idea/download/#section=linux</a></p>
+<p>PyCharm : <a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">https://www.jetbrains.com/pycharm/</a></p>
+<p>WebStrom : <a href="https://www.jetbrains.com/webstorm/" target="_blank" rel="noopener">https://www.jetbrains.com/webstorm/</a></p>
+<p>2、移动至安装目录(以opt为例)</p>
+<pre><code># sudo mv idea_file.tar.gz</code></pre><p>3、解压即安装</p>
+<pre><code># sudo tar -zxvf idea_file.tar.gz</code></pre><p>4、搜索运行即可</p>
+<p>也可进入 idea安装目录下，bin目录，运行idea.sh</p>
+<p>5、注册码</p>
+<p>Jetbrains提供学生邮箱注册，即可免费使用Ultimate，学生党简直太好了</p>
+<p><a href="http://idea.lanyus.com/" target="_blank" rel="noopener">http://idea.lanyus.com/</a></p>
+<p><strong>四、Apache Tomcat</strong></p>
+<p>1、下载</p>
+<p><a href="http://tomcat.apache.org/download-80.cgi" target="_blank" rel="noopener">http://tomcat.apache.org/download-80.cgi</a><br>（此处以.tar.gz为例）</p>
+<p>2、移动至安装目录，解压安装</p>
+<pre><code># sudo mv tomcat_file.tar.gz /usr/local/java/
+# cd /usr/local/java/
+# sudo tar -zxvf tomcat_file.tar.gz </code></pre><p>3、启动脚本文件配置</p>
+<pre><code># cd /usr/local/java/tomcat_file/
+# sudo vim ./bin/startup.sh
+
+在startup.sh文件中添加JDK和JRE环境变量
+JAVA_HOME=/usr/local/java/jdk_file
+JRE_HOME=/usr/local/java/jre_file
+CLASSPATH=.:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/lib/tools.jar:${JRE_HOME}/lib
+PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:${PATH}
+TOMCAT_HOME=/usr/local/java/tomcat_file</code></pre><p>4、启动tomcat</p>
+<pre><code># sudo  ./bin/startup.sh</code></pre><p>5、浏览器测试</p>
+<p>在浏览器地址栏输入：<a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a></p>
+<p>显示tomcat猫则成功</p>
+<p>6、关闭tomcat</p>
+<pre><code># sudo ./bin/shutdown.sh</code></pre><p><strong>五、MySQL</strong></p>
+<p>1、安装，期间会提示设置密码</p>
+<pre><code>#  sudo apt-get install mysql-server mysql-client </code></pre><p>2、查看安装</p>
+<pre><code># sudo netstat -tap | grep mysql</code></pre><p>3、启动</p>
+<pre><code># sudo service mysql start</code></pre><p>4、修改密码</p>
+<pre><code>mysql&gt; set password for root@localhost = password(&#39;shapolang&#39;); </code></pre><p>5、删除卸载</p>
+<pre><code># sudo apt-get --auto-remove purge mysql\*</code></pre><p>6、迁移数据存储路径</p>
+<p><a href="https://blog.csdn.net/four_stone5/article/details/79569150" target="_blank" rel="noopener">Ubuntu中修改MySQL5.7数据存储路径</a></p>
+<p>7、服务器之间数据迁移</p>
+<p><a href="https://blog.csdn.net/LJFPHP/article/details/78691875" target="_blank" rel="noopener">mysql数据库从一台服务器迁移到另一台服务器上</a><br><a href="https://blog.csdn.net/gatieme/article/details/51673229" target="_blank" rel="noopener">两台Linux系统之间传输文件的几种方法</a></p>
+<p>8、中文乱码</p>
+<p><a href="https://blog.csdn.net/tjcyjd/article/details/52197547" target="_blank" rel="noopener">Linux下mysql中文乱码解决方案</a></p>
+<p><strong>六、Nginx</strong></p>
+<p>1、安装</p>
+<pre><code># sudo apt-get install nginx</code></pre><p>2、文件结构</p>
+<blockquote>
+<p>所有的配置文件都在/etc/nginx下，并且每个虚拟主机已经安排在了/etc/nginx/sites-available下<br>程序文件在/usr/sbin/nginx<br>日志放在了/var/log/nginx中<br>并已经在/etc/init.d/下创建了启动脚本nginx<br>默认的虚拟主机的目录设置在了/var/www/nginx-default (有的版本 默认的虚拟主机的目录设置在了/var/www, 请参考/etc/nginx/sites-available里的配置)</p>
+</blockquote>
+<p>3、启动</p>
+<pre><code># sudo /etc/init.d/nginx start</code></pre><p><a href="https://blog.csdn.net/tang05709/article/details/83150786" target="_blank" rel="noopener">nginx 跳转www的方式</a></p>
+<p><strong>七、Redis</strong></p>
+<p>1、安装</p>
+<pre><code># sudo apt-get update
+# sudo apt-get install redis-server</code></pre><p>2、启动redis</p>
+<pre><code># redis-server</code></pre><p>3、运行redis客户端（另外打开窗口）</p>
+<pre><code># redis-cli</code></pre><p>4、卸载</p>
+<p>卸载软件</p>
+<pre><code># apt-get remove redis</code></pre><p>清除配置</p>
+<pre><code># apt-get remove --purge redis</code></pre><p>删除残留文件,先查找出来文件,再进行删除</p>
+<pre><code>find / -name redis</code></pre><h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><p><a href="https://yq.aliyun.com/articles/225380" target="_blank" rel="noopener">1、阿里云linux服务器如何挂载数据盘？</a></p>
+<h2 id="未完待续。。。"><a href="#未完待续。。。" class="headerlink" title="未完待续。。。"></a>未完待续。。。</h2><h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>1、<a href="https://www.jianshu.com/p/b2288ef3f11e" target="_blank" rel="noopener">Ubuntu 16.04.3 LTS 更换国内快速更新源 - 简书</a></p>
+<p>2、<a href="https://www.cnblogs.com/dtiove/p/5917263.html" target="_blank" rel="noopener">ubuntu16.04 14.04更换源</a></p>
+<p>3、<a href="https://blog.csdn.net/zhang__liuchen/article/details/77961893" target="_blank" rel="noopener">ubuntu16.04安装网易云音乐</a></p>
+<p>4、<a href="https://blog.csdn.net/weixin_31317775/article/details/78726460" target="_blank" rel="noopener">Ubuntu 16.04 安装网易云音乐 无法启动的问题</a></p>
+<p>5、<a href="https://blog.csdn.net/ljheee/article/details/52966456" target="_blank" rel="noopener">Ubuntu 16.04安装sogou 拼音输入法</a></p>
+<p>6、<a href="https://www.cnblogs.com/EasonJim/p/7203635.html" target="_blank" rel="noopener">Ubuntu 16.04安装Maven</a></p>
+<p>7、<a href="https://blog.csdn.net/u011630575/article/details/78490080" target="_blank" rel="noopener">Ubuntu 安装和配置Tomcat</a></p>
+<p>8、<a href="https://blog.csdn.net/Mikeoperfect/article/details/79468944" target="_blank" rel="noopener">ubuntu 16.04安装redis的两种方式（apt和编译方式）和卸载</a></p>
+<p>9、<a href="https://blog.csdn.net/seeol/article/details/27588085" target="_blank" rel="noopener">ubuntu卸载redis</a></p>
+<p>10、<a href="https://blog.csdn.net/u014520047/article/details/70919278" target="_blank" rel="noopener">ubuntu 安装 redis，并配置远程、密码</a></p>
+<p>11、<a href="https://blog.csdn.net/w3045872817/article/details/77334886" target="_blank" rel="noopener">ubuntu完全卸载mysql</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
