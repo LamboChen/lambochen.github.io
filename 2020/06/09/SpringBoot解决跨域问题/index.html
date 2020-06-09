@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            SpringBoot解决跨域问题
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:27&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:28
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/86665813" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/86665813</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>跨域问题，是web开发都绕不开的难题。但我们首先要明确以下几点</p>
+<blockquote>
+<ol>
+<li>跨域只存在于浏览器端，不存在于安卓/ios/Node.js/python/ java等其它环境</li>
+<li>跨域请求能发出去，服务端能收到请求并正常返回结果，只是结果被浏览器拦截了。</li>
+</ol>
+</blockquote>
+<p>之所以会跨域，是因为受到了同源策略的限制，同源策略要求源相同才能正常进行通信，即协议、域名、端口号都完全一致。</p>
+<p>浏览器出于安全的考虑，使用 XMLHttpRequest对象发起 HTTP请求时必须遵守同源策略，否则就是跨域的HTTP请求，默认情况下是被禁止的。换句话说，浏览器安全的基石是同源策略。</p>
+<blockquote>
+<p>同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。</p>
+</blockquote>
+<p>更多关于跨域请求的解释，参考 <a href="https://zhuanlan.zhihu.com/p/24632196" target="_blank" rel="noopener">1、什么是跨域请求?</a></p>
+<h2 id="什么是CROS？"><a href="#什么是CROS？" class="headerlink" title="什么是CROS？"></a>什么是CROS？</h2><blockquote>
+<p>CORS是一个W3C标准，全称是”跨域资源共享”（Cross-origin resource sharing），允许浏览器向跨源服务器，发出XMLHttpRequest请求，从而克服了AJAX只能同源使用的限制。它通过服务器增加一个特殊的Header[Access-Control-Allow-Origin]来告诉客户端跨域的限制，如果浏览器支持CORS、并且判断Origin通过的话，就会允许XMLHttpRequest发起跨域请求。</p>
+</blockquote>
+<p><strong>CORS Header</strong></p>
+<ul>
+<li>Access-Control-Allow-Origin: <a href="http://www.xxx.com" target="_blank" rel="noopener">http://www.xxx.com</a>        </li>
+<li>Access-Control-Max-Age：86400</li>
+<li>Access-Control-Allow-Methods：GET, POST, OPTIONS, PUT, DELETE</li>
+<li>Access-Control-Allow-Headers: content-type</li>
+<li>Access-Control-Allow-Credentials: true</li>
+</ul>
+<p>含义解释：<br>1、Access-Control-Allow-Origin 允许<a href="http://www.xxx.com域（自行设置，这里只做示例）发起跨域请求" target="_blank" rel="noopener">http://www.xxx.com域（自行设置，这里只做示例）发起跨域请求</a><br>2、Access-Control-Max-Age 设置在86400秒不需要再发送预校验请求<br>3、Access-Control-Allow-Methods 设置允许跨域请求的方法<br>4、Access-Control-Allow-Headers 允许跨域请求包含content-type<br>5、Access-Control-Allow-Credentials  设置允许Cookie</p>
+<h2 id="filter方式解决跨域"><a href="#filter方式解决跨域" class="headerlink" title="filter方式解决跨域"></a>filter方式解决跨域</h2><p>在项目中添加filter类：</p>
+<pre><code class="java">/**
+ * @Description 用于解决跨域问题
+ * @Author chenlinghong
+ * @Date 2018/12/1 16:20
+ **/
+public class AllowOriginFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // TODO 其他处理
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        String origin = request.getHeader(&quot;Origin&quot;);
+        if (StringUtils.isNotBlank(origin)) {
+            //设置响应头，允许跨域访问
+            //带cookie请求时，必须为全匹配，不能使用*
+            /**
+             * 表示允许 origin 发起跨域请求。
+             */
+            response.addHeader(&quot;Access-Control-Allow-Origin&quot;, origin);
+        }
+
+        /**
+         * GET,POST,OPTIONS，PUT,DELETE 表示允许跨域请求的方法
+         */
+        response.addHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;GET, POST, OPTIONS, PUT, DELETE&quot;);
+
+        /**
+         * 表示在86400秒内不需要再发送预校验请求
+         */
+        response.addHeader(&quot;Access-Control-Max-Age&quot;, &quot;86400&quot;);
+
+        //支持所有自定义头
+        String headers = request.getHeader(&quot;Access-Control-Request-Headers&quot;);
+        if (StringUtils.isNotBlank(headers)) {
+            //允许JSON请求，并进行预检命令缓存
+            response.addHeader(&quot;Access-Control-Allow-Headers&quot;, headers);
+        }
+
+        response.addHeader(&quot;Access-Control-Max-Age&quot;, &quot;3600&quot;);
+
+        //允许cookie
+        response.addHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;);
+        filterChain.doFilter(servletRequest, response);
+    }
+
+    @Override
+    public void destroy() {
+        // TODO 其他处理
+    }
+}
+</code></pre>
+<h2 id="SpringBoot项目解决跨域"><a href="#SpringBoot项目解决跨域" class="headerlink" title="SpringBoot项目解决跨域"></a>SpringBoot项目解决跨域</h2><p>在SpringBoot项目中，推崇的都是约定优于配置，尽量少的配置。以下提供两种方式，选其一即可</p>
+<p><strong>1、注入重写方法的WebMvcConfigurer</strong></p>
+<p>在解决跨域问题上，我们只需要进行注入一个对象，我们对其进行重写其方法即可。</p>
+<p>注：整个Application的handler均允许跨域。</p>
+<p>CORSConfig.java</p>
+<pre><code class="java">/**
+ * @Description 跨域配置
+ * @Author chenlinghong
+ * @Date 2019/1/27 13:31
+ **/
+@Configuration
+public class CORSConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping(&quot;/**&quot;)
+                        .allowedHeaders(&quot;*&quot;)
+                        .allowedMethods(&quot;*&quot;)
+                        .allowedOrigins(&quot;*&quot;);
+            }
+        };
+    }
+}
+</code></pre>
+<p>2、@CrossOrigin    - 终极Boss</p>
+<p>只需要在允许跨域的接口方法上进行添加注解即可，也可以直接在Controller类上添加，表示该Controller所有方法均允许跨域访问。</p>
+<p>You can add to your @RequestMapping annotated handler method a @CrossOrigin annotation in order to enable CORS on it (by default @CrossOrigin allows all origins and the HTTP methods specified in the @RequestMapping annotation):</p>
+<pre><code>@RestController
+@RequestMapping(&quot;/account&quot;)
+public class AccountController {
+
+    @CrossOrigin
+    @GetMapping(&quot;/{id}&quot;)
+    public Account retrieve(@PathVariable Long id) {
+        // ...
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public void remove(@PathVariable Long id) {
+        // ...
+    }
+}</code></pre><p>It is also possible to enable CORS for the whole controller:</p>
+<pre><code>@CrossOrigin(origins = &quot;http://domain2.com&quot;, maxAge = 3600)
+@RestController
+@RequestMapping(&quot;/account&quot;)
+public class AccountController {
+
+    @GetMapping(&quot;/{id}&quot;)
+    public Account retrieve(@PathVariable Long id) {
+        // ...
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public void remove(@PathVariable Long id) {
+        // ...
+    }
+}</code></pre><p>以上代码引用自：<a href="https://spring.io/blog/2015/06/08/cors-support-in-spring-framework" target="_blank" rel="noopener">6、CORS support in Spring Framework</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://zhuanlan.zhihu.com/p/24632196" target="_blank" rel="noopener">1、什么是跨域请求?</a><br><a href="https://baike.baidu.com/item/%E5%90%8C%E6%BA%90%E7%AD%96%E7%95%A5" target="_blank" rel="noopener">2、同源策略 - 百度百科</a><br><a href="https://www.jianshu.com/p/55643abe7a18" target="_blank" rel="noopener">3、Spring Boot设置跨域访问</a><br><a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing" target="_blank" rel="noopener">4、Cross-origin resource sharing - wikipedia</a><br><a href="https://juejin.im/post/5a6320d56fb9a01cb64ee191" target="_blank" rel="noopener">5、我知道的跨域与安全</a><br><a href="https://spring.io/blog/2015/06/08/cors-support-in-spring-framework" target="_blank" rel="noopener">6、CORS support in Spring Framework</a><br><a href="https://blog.csdn.net/besto229/article/details/78637315" target="_blank" rel="noopener">7、CORS跨域 GET、POST、PUT、DELETE等请求</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
