@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Java反射学习笔记
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:23&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:23
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/78974373" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/78974373</a></p>
+<h1 id="Java反射学习笔记"><a href="#Java反射学习笔记" class="headerlink" title="Java反射学习笔记"></a>Java反射学习笔记</h1><p>本文是我在慕课网学习Java反射视频（<a href="https://www.imooc.com/learn/199" target="_blank" rel="noopener">反射-Java高级开发必须懂的</a>）时所写的笔记，不足之处，欢迎指正。</p>
+<p><strong>Java反射机制：</strong><br>JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意方法和属性；这种动态获取信息以及动态调用对象方法的功能称为java语言的反射机制。（<a href="https://baike.baidu.com/item/JAVA%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/6015990?fr=aladdin" target="_blank" rel="noopener">Java反射机制</a>）</p>
+<h4 id="一、Class类的使用"><a href="#一、Class类的使用" class="headerlink" title="一、Class类的使用"></a>一、Class类的使用</h4><p>获得Foo类的类类型：</p>
+<pre><code>Foo foo1 = new Foo();
+1 ）Class c1 = Foo.class;
+2 ) Class c2 =  foo1.getClass();
+System.out.priontln(c1 == c2);    //true
+3 ) Class c3 = null;
+     c3 = Class.forName(&quot;Foo&quot;);    
+     //Foo为完整类名</code></pre><p>通过类的类类型创建该类的对象实例：</p>
+<pre><code>Foo foo = (Foo)c1.newInstence();        
+//要求Foo有无参构造方法
+//动态加载类
+try{
+    //动态加载类，在运行时刻加载
+    Class c = Class.forName(args[0]);
+    //通过类类型，创建该类对象
+    OfficeAble os = (OfficeAble)c.newInstance();
+    oa.start();
+} catch(Exception e){
+    e.printStackTrace();
+}</code></pre><h4 id="二、-获取方法信息"><a href="#二、-获取方法信息" class="headerlink" title="二、 获取方法信息"></a>二、 获取方法信息</h4><pre><code>public class ClassUtil{
+    public static void printClassMessage(Object obj){
+        //要获取类的信息，首先要获取类的类类型
+        Class c = obj.getClass();        
+        //传递的是哪个子类的对象  c就是该子类的类类型
+        //获取类的名称
+        System.out.println(&quot;类的名称:&quot; + c.getName());
+        /* Method类 ，方法对象
+        * 一个成员方法就是一个Method对象
+        * getMethods()方法获取的是所有的public 的函数，包括父类继承而来的
+        * getDeclaredMethods()获取的是所有该类自己声明的方法，不同访问权限
+        *./
+        Method[] ms = c.getMethods();    //c.getDeclaredMethods();
+        for(int i=0;i&lt;ms.length;i++){
+            //得到方法的返回值类型的类类型
+            Class returnType = ms[i].getReturnType();
+            System.out.print(returnType.getName()+&quot; &quot;);
+        //得到方法的名称
+            System.out.print(ms[i].getName()+&quot; ( &quot;;
+        //获取参数类型     得到的是参数列表的类型的类类型
+            Class[] paramTypes = ms[i].getParameterTypes();
+            for(Class class1 : paramTypes){
+            System.out.println(class1.getName()+&quot;,&quot;);
+            }
+            System.out.println(“）”）；
+        }
+    }
+}</code></pre><h4 id="三、获取成员变量、构造函数信息"><a href="#三、获取成员变量、构造函数信息" class="headerlink" title="三、获取成员变量、构造函数信息"></a>三、获取成员变量、构造函数信息</h4><p>获取类的成员函数、成员变量</p>
+<pre><code>public static void printFieldMessage(Object obj){
+    Class c = obj.getClass();
+    /* 成员变量也是对象
+    * java.lang.reflect.Field
+    * Field类封装了关于成员变量的操作
+    * getField()方法获取的是所有的public的成员变量的信息
+    * getDeclaredFields()获取的是该类自己声明的成员变量的信息
+    */
+    Field[] fs = c.getDeclaredFields();
+    for(Field field : fs){
+        //得到成员变量的类型的类类型
+        Class fieldType = field.getType();
+        String typeName = fieldType.getName();
+        //得到成员变量的名称
+        String fieldName = field.getName();
+        System.out.println(typeName+&quot;,&quot;+fieldName);
+    }
+}</code></pre><p>//获取构造函数</p>
+<pre><code>public static void printConMessage(Object obj){
+    Class c = obj.getClass();
+    /* 构造函数也是对象 
+    * java.lang.Constructor中封装了构造函数的信息
+    * getConstructor获取所有的public的构造函数
+    * getDeclaredConstructors()得到所有的构造函数
+    */
+    Constructor[] cs = c.getDeclaredConstructors();
+    for(Constructor constructor : cs){
+        System.out.println(constructor.getName()+&quot;(&quot;);
+        //获取构造函数的参数列表   得到的是参数列表的类类型
+                Class[] paramTypes = constructor.getParameterTypes();
+        for(Class class1 : paramTypes){
+            System.out.print(class1.getName()+&quot;,&quot;);
+        }
+        System.out.println(&quot;)&quot;);
+    }
+}</code></pre><h4 id="四、java方法反射的基本操作"><a href="#四、java方法反射的基本操作" class="headerlink" title="四、java方法反射的基本操作"></a>四、java方法反射的基本操作</h4><p>1）如何获取某个方法<br>    方法的名称和方法的参数列表才能唯一决定某个方法<br>2）方法反射的操作<br>    method.invoke(对象，参数列表);</p>
+<pre><code>public class MethodDemo1{
+    public static void main(String [] args){
+        //要获取pingt(int,int)方法 1、要获取一个方法就是获取类的信息，获取类的信息首先要获取类的类类型
+        A a1 = new A();
+        Class c = a1.getClass();
+        /* 2、获取方法  名称和参数列表来决定
+        * getMethod获取的是public的方法
+        * getDeclaredMethod自己声明的方法
+        */
+        try{
+            // Method m = c.getMethod(&quot;print&quot;,new Class[]{int.class,int.class});
+            Method m = c.getMethod(&quot;print&quot;,int.class,int.class);
+
+            //方法的反射操作
+            // 方法的反射操作是用m对象来进行方法调用  和a1.print调用的效果相同
+            //方法如果没有返回值则返回null
+            //Object o = m.invoke(a1,new Object[]{10,20});
+                Object o = m.invoke(a1,10,20);
+            //获取方法对象
+            Method m1 = c.getMethod(&quot;print&quot;,String.class,String.class);
+            //用方法进行反射操作
+            o = m1.invoke(a1,&quot;hello&quot;,&quot;world&quot;); 
+
+            // Method m2 = c.getMethod(&quot;print&quot;,new Class[]{});
+            Method m2 = c.getMethod(&quot;print&quot;);
+            // m2.invoke(a1,new Object[]{});
+            m2.invoke(a1);
+        } catch(Excepetion e){
+            e.printStackTrace();
+        }
+    }
+}</code></pre><h4 id="五、通过反射了解集合泛型的本质"><a href="#五、通过反射了解集合泛型的本质" class="headerlink" title="五、通过反射了解集合泛型的本质"></a>五、通过反射了解集合泛型的本质</h4><pre><code>public class MethodDemo4{
+    public static void main(String[] args){
+        ArrayList list = new ArrayList();
+        ArrayList&lt;String&gt; list1 = new ArrayList&lt;String&gt;();
+        list1.add(&quot;hello&quot;);
+        //list1.add(20);        //错误
+        Class c1 = list.getClass();
+        Class c2 = list1.getClass();
+        System.out.println(c1 == c2);        //true
+        //反射的操作都是编译之后的操作
+
+        /*  c1==c2 结果返回说明编译之后的集合的泛型是去泛型化的
+        *  Java中的集合的泛型，是防止错误输入的，只在编译阶段有效
+        * 绕过编译就无效了
+        * 验证：通过方法的反射绕过编译
+        */
+        try{
+            Method m = c2.getMethod(&quot;add&quot;,Object.class);
+            m.invoke(list1,100);
+            System.out.println(list1.size());    //2
+            System.out.println(list1);        //[hello,100]
+            //此时不能用for-each遍历
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}</code></pre><p>推荐几篇优秀的博文：<br><a href="http://blog.csdn.net/liujiahan629629/article/details/18013523" target="_blank" rel="noopener">Java中的反射机制</a><br><a href="http://www.importnew.com/17616.html" target="_blank" rel="noopener">Java反射</a><br><a href="https://www.cnblogs.com/luoxn28/p/5686794.html" target="_blank" rel="noopener">深入理解Java反射</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
