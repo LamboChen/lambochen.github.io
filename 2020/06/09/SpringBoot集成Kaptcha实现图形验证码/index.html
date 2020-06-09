@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            SpringBoot集成Kaptcha实现图形验证码
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:25&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:26
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/86645354" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/86645354</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>相信大家在浏览网页的时候，经常会碰到人机校验。很经典的要属Google的人机校验，用多张图片进行点击校验。可以说是对于我们人类来说就是很烦的啦。烦归烦，但是为了安全着想，我们还是需要为自己的项目加上验证码机制，特别是一些防刷的接口调用下。今天我们就来学习简单的图形验证码实现。</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>SpringBoot DEMO，Maven项目。<br>创建SpringBoot项目很简单，Intellij IDEA旗舰版可直接创建。</p>
+<p>引入kaptcha maven依赖</p>
+<pre><code>        &lt;!-- https://mvnrepository.com/artifact/com.github.penggle/kaptcha --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.github.penggle&lt;/groupId&gt;
+            &lt;artifactId&gt;kaptcha&lt;/artifactId&gt;
+            &lt;version&gt;2.3.2&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre><h2 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h2><p>application.yml</p>
+<pre><code>kaptcha:
+  border: &quot;yes&quot;                    //    是否有边框，默认为yes，可选yes、no
+  border.color: 105,179,90        //边框颜色
+  textproducer:            
+    font:
+      color: blue            //    验证码字体颜色
+      size: 30                // 文本字符大小
+      names: 宋体,楷体,微软雅黑            //文本字体样式
+    char:
+      length: 4            //验证码文本字符长度
+  image:
+    width: 120            // 图片宽度
+    height: 40            // 图片高度
+  session:
+    key: code            // 存储session key</code></pre><p>KaptchaConfig.java</p>
+<pre><code class="java">/**
+ * @Description Kaptcha配置类 用于生成图形验证码
+ * @Author chenlinghong
+ * @Date 2019/1/25 10:31
+ **/
+@Component
+public class KaptchaConfig {
+
+    @Value(&quot;${kaptcha.border}&quot;)
+    private String border;
+
+    @Value(&quot;${kaptcha.border.color}&quot;)
+    private String borderColor;
+
+    @Value(&quot;${kaptcha.textproducer.font.color}&quot;)
+    private String textproducerFontColor;
+
+    @Value(&quot;${kaptcha.textproducer.font.size}&quot;)
+    private String textproducerFontSize;
+
+    @Value(&quot;${kaptcha.textproducer.font.names}&quot;)
+    private String textproducerFontNames;
+
+    @Value(&quot;${kaptcha.textproducer.char.length}&quot;)
+    private String textproducerCharLength;
+
+    @Value(&quot;${kaptcha.image.width}&quot;)
+    private String imageWidth;
+
+    @Value(&quot;${kaptcha.image.height}&quot;)
+    private String imageHeight;
+
+    @Value(&quot;${kaptcha.session.key}&quot;)
+    private String sessionKey;
+
+    @Bean
+    public DefaultKaptcha getDefaultKapcha(){
+        DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
+        Properties properties = new Properties();
+        properties.setProperty(&quot;kaptcha.border&quot;, border);
+        properties.setProperty(&quot;kaptcha.border.color&quot;, borderColor);
+        properties.setProperty(&quot;kaptcha.textproducer.font.color&quot;, textproducerFontColor);
+        properties.setProperty(&quot;kaptcha.textproducer.font.size&quot;, textproducerFontSize);
+        properties.setProperty(&quot;kaptcha.textproducer.font.names&quot;, textproducerFontNames);
+        properties.setProperty(&quot;kaptcha.textproducer.char.length&quot;, textproducerCharLength);
+        properties.setProperty(&quot;kaptcha.image.width&quot;, imageWidth);
+        properties.setProperty(&quot;kaptcha.image.height&quot;, imageHeight);
+        properties.setProperty(&quot;kaptcha.session.key&quot;, sessionKey);
+
+        Config config = new Config(properties);
+        defaultKaptcha.setConfig(config);
+        return defaultKaptcha;
+    }
+
+}
+</code></pre>
+<p>从application.yml中获取到配置属性，通过@Bean注入返回值为DefaultKaptcha的方法，方法体内获取到相应的properties进行配置DefaultKaptcha。即可在其他类中进行注入此类，使用。</p>
+<h2 id="获取图形验证码接口"><a href="#获取图形验证码接口" class="headerlink" title="获取图形验证码接口"></a>获取图形验证码接口</h2><p>ImageController.java</p>
+<pre><code class="java">@CrossOrigin
+@Slf4j
+@RestController
+@RequestMapping(value = &quot;/img&quot;)
+public class ImageController {
+
+    /* 注入Kaptcha */
+    @Autowired
+    private DefaultKaptcha defaultKaptcha;
+
+    @GetMapping(value = &quot;/code&quot;)
+    public Result defaultKaptcha(HttpServletRequest request, HttpServletResponse response){
+        byte[] captchaChallengeAsJpeg;
+        ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
+        /**
+         * 生成验证码字符串并保存到session中
+         */
+        String createText = defaultKaptcha.createText();
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConstant.IMAGE_CODE, createText);
+        /**
+         * 使用生成的验证码字符串返回一个BufferedImage对象并转为byte写入到byte数组中
+         */
+        BufferedImage challenge = defaultKaptcha.createImage(createText);
+        try {
+            ImageIO.write(challenge,&quot;jpg&quot;,jpegOutputStream);
+        } catch (IOException e) {
+            log.error(&quot;生成图形验证码失败&quot;,e);
+            throw new BusinessException(ErrorEnum.CRATE_IMAGE_ERROR);    // 抛出异常，可以不用关心
+        }
+        /**
+         * 定义response输出类型为image/jpeg类型，使用response输出流输出图片的byte数组
+         */
+        captchaChallengeAsJpeg = jpegOutputStream.toByteArray();
+        response.setHeader(&quot;Cache-Control&quot;, &quot;no-store&quot;);
+        response.setHeader(&quot;Pragma&quot;, &quot;no-cache&quot;);
+        response.setDateHeader(&quot;Expires&quot;,0);
+        response.setContentType(&quot;image/jpeg&quot;);
+        try {
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+            servletOutputStream.write(captchaChallengeAsJpeg);
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (IOException e) {
+            log.error(&quot;输出验证码失败&quot;,e);
+            throw new BusinessException(ErrorEnum.CRATE_IMAGE_ERROR);    // 抛出异常，可以不用关心
+        }
+        return ResultUtil.success();    // 返回成功提示信息
+    }
+}</code></pre>
+<p>通过文件流的方式，直接输出验证码图片。</p>
+<h2 id="请求获取"><a href="#请求获取" class="headerlink" title="请求获取"></a>请求获取</h2><p>启动项目，浏览器访问 <a href="http://127.0.0.1:8080/img/code" target="_blank" rel="noopener">http://127.0.0.1:8080/img/code</a><br><img src="https://img-blog.csdnimg.cn/20190125141228246.png" alt="在这里插入图片描述"></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、<a href="https://juejin.im/entry/582bf335570c35006ce45ded" target="_blank" rel="noopener">Kaptcha 和 JCaptcha 使用介绍和实例</a><br>2、<a href="https://code.google.com/archive/p/kaptcha/" target="_blank" rel="noopener">Google Code - Kaptcha</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
