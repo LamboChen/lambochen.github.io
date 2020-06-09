@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Spring入门之事务管理【一】XML配置文件方式
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:57&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:58
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79168240" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79168240</a></p>
+<p><strong>前言：</strong></p>
+<ul>
+<li>本文讲解Spring的事务管理（XML配置文件方式）实现</li>
+<li>本文是通过一步步创建项目的方式讲解</li>
+<li>本文主要是讲具体的操作，对于事务管理的原理并不会深入讲解</li>
+</ul>
+<p><strong>环境：</strong></p>
+<ul>
+<li>Intellij IDEA 2017 CI</li>
+</ul>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p><strong>1、新建Spring项目</strong></p>
+<p>具体项目名、类名及路径：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI2MDMxNzE2ODkx?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>不清楚怎么创建Spring项目的？猛点<a href="http://blog.csdn.net/chensanwa/article/details/79148929" target="_blank" rel="noopener">Intellij IDEA创建Spring的Hello World项目</a></p>
+<p>OrdersDao类：</p>
+<pre><code>package spring.dao;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class OrdersDao {
+
+    //    注入jdbcTemplate
+    private JdbcTemplate jdbcTemplate;
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+    /*
+    做对数据库的操作，不写业务操作
+     */
+
+    //减少金额
+    public void lessMoney(){
+        String sql = &quot;update account set salary=salary-? where name=?&quot;;
+        jdbcTemplate.update(sql,100,&quot;Tom&quot;);
+    }
+
+    //增加金额
+    public void moreMoney(){
+        String sql = &quot;update account set salary=salary+? where name=?&quot;;
+        jdbcTemplate.update(sql,100,&quot;John&quot;);
+    }
+}
+</code></pre><p>如果不清楚上面类中方法的内容的，或者对Spring中的Bean管理，注入属性不是很明白的，可以看下本人的这几篇文章</p>
+<ul>
+<li><a href="http://blog.csdn.net/chensanwa/article/details/79150162" target="_blank" rel="noopener">Spring的Bean管理（XML配置文件方式）</a></li>
+<li><a href="http://blog.csdn.net/chensanwa/article/details/79154172" target="_blank" rel="noopener">Spring属性注入【一】 注入方式介绍</a></li>
+<li><a href="http://blog.csdn.net/chensanwa/article/details/79154221" target="_blank" rel="noopener">Spring属性注入【二】 注入对象类型属性</a></li>
+<li><a href="http://blog.csdn.net/chensanwa/article/details/79154291" target="_blank" rel="noopener">Spring属性注入【三】 复杂类型注入</a></li>
+<li><a href="http://blog.csdn.net/chensanwa/article/details/79168249" target="_blank" rel="noopener">Spring入门之C3P0连接池</a></li>
+</ul>
+<p>OrdersService类：</p>
+<pre><code>package spring.service;
+
+import spring.dao.OrdersDao;
+
+public class OrdersService {
+    private OrdersDao ordersDao;
+
+    public void setOrdersDao(OrdersDao ordersDao) {
+        this.ordersDao = ordersDao;
+    }
+
+    //调用dao方法
+    /* 业务逻辑层 */
+
+    //转账业务
+    public void accountMonry(){
+
+        ordersDao.lessMoney();  //减少金额
+
+        int i = 10/0;   //模拟出现异常
+
+        ordersDao.moreMoney();  //增加金额
+    }
+}</code></pre><p>注：本例只是为了说明事务管理，其中的方法在实际项目中并没有什么意思</p>
+<p>TestService类：</p>
+<pre><code>package spring.test;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import spring.service.OrdersService;
+
+public class TestService {
+
+    @Test
+    public void testService(){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        OrdersService ordersService = (OrdersService) applicationContext.getBean(&quot;ordersService&quot;);
+        ordersService.accountMonry();
+    }
+
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+       xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+    &lt;!--配置C3P0连接池--&gt;
+    &lt;bean id=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;!--注入属性值--&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;jdbcUrl&quot; value=&quot;jdbc:mysql:///test&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;user&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!--service注入dao--&gt;
+    &lt;bean class=&quot;spring.service.OrdersService&quot; id=&quot;ordersService&quot;&gt;
+        &lt;property name=&quot;ordersDao&quot; ref=&quot;ordersDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+    &lt;!--dao注入jdbcTemplate--&gt;
+    &lt;bean class=&quot;spring.dao.OrdersDao&quot; id=&quot;ordersDao&quot;&gt;
+        &lt;property name=&quot;jdbcTemplate&quot; ref=&quot;jdbcTemplate&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!--jdbcTemplate注入数据源--&gt;
+    &lt;bean class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot; id=&quot;jdbcTemplate&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+
+&lt;/beans&gt;</code></pre><p><strong>2、配置事务管理器</strong></p>
+<pre><code>&lt;!--第一步 配置事务管理器--&gt;
+    &lt;bean id=&quot;dataSourceTransactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;!--注入数据源，指定对哪个数据库进行操作--&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;</code></pre><p><strong>3、配置事务增强</strong></p>
+<pre><code>&lt;!--第二步 配置事务增强--&gt;
+    &lt;tx:advice id=&quot;txadvice&quot; transaction-manager=&quot;dataSourceTransactionManager&quot;&gt;
+        &lt;!--做事务操作--&gt;
+        &lt;tx:attributes&gt;
+            &lt;!--设置进行事务操作的方法匹配规则--&gt;
+            &lt;tx:method name=&quot;account*&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;</code></pre><p><strong>4、配置切面</strong></p>
+<pre><code>&lt;!--第三步 配置切面--&gt;
+    &lt;aop:config&gt;
+        &lt;!--切入点--&gt;
+        &lt;aop:pointcut id=&quot;pointcut1&quot; expression=&quot;execution(* spring.service.OrdersService.*(..))&quot;&gt;&lt;/aop:pointcut&gt;
+        &lt;!--切面--&gt;
+        &lt;aop:advisor advice-ref=&quot;txadvice&quot; pointcut-ref=&quot;pointcut1&quot;&gt;&lt;/aop:advisor&gt;
+    &lt;/aop:config&gt;</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+       xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+    &lt;!--配置C3P0连接池--&gt;
+    &lt;bean id=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;!--注入属性值--&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;jdbcUrl&quot; value=&quot;jdbc:mysql:///test&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;user&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+
+    &lt;!--第一步 配置事务管理器--&gt;
+    &lt;bean id=&quot;dataSourceTransactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;!--注入数据源，指定对哪个数据库进行操作--&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!--第二步 配置事务增强--&gt;
+    &lt;tx:advice id=&quot;txadvice&quot; transaction-manager=&quot;dataSourceTransactionManager&quot;&gt;
+        &lt;!--做事务操作--&gt;
+        &lt;tx:attributes&gt;
+            &lt;!--设置进行事务操作的方法匹配规则--&gt;
+            &lt;tx:method name=&quot;account*&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;
+
+    &lt;!--第三步 配置切面--&gt;
+    &lt;aop:config&gt;
+        &lt;!--切入点--&gt;
+        &lt;aop:pointcut id=&quot;pointcut1&quot; expression=&quot;execution(* spring.service.OrdersService.*(..))&quot;&gt;&lt;/aop:pointcut&gt;
+        &lt;!--切面--&gt;
+        &lt;aop:advisor advice-ref=&quot;txadvice&quot; pointcut-ref=&quot;pointcut1&quot;&gt;&lt;/aop:advisor&gt;
+    &lt;/aop:config&gt;
+
+
+    &lt;!--service注入dao--&gt;
+    &lt;bean class=&quot;spring.service.OrdersService&quot; id=&quot;ordersService&quot;&gt;
+        &lt;property name=&quot;ordersDao&quot; ref=&quot;ordersDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+    &lt;!--dao注入jdbcTemplate--&gt;
+    &lt;bean class=&quot;spring.dao.OrdersDao&quot; id=&quot;ordersDao&quot;&gt;
+        &lt;property name=&quot;jdbcTemplate&quot; ref=&quot;jdbcTemplate&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!--jdbcTemplate注入数据源--&gt;
+    &lt;bean class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot; id=&quot;jdbcTemplate&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+
+&lt;/beans&gt;</code></pre><p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI2MDMzMjE5NTMx?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><strong>5、测试</strong></p>
+<p>测试前：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI2MDMzMzMyMjcy?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI2MDMzNDA5NDUx?x-oss-process=image/format,png" alt="这里写图片描述"><br>测试中断，因为我们模拟了异常的发生。</p>
+<p>数据库中：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI2MDMzNTAyMzE2?x-oss-process=image/format,png" alt="这里写图片描述"><br>结果表明，在异常发生后，事务回滚，并没有更改数据库中的数据</p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
