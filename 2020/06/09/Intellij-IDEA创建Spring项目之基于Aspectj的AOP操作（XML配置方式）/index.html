@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Intellij IDEA创建Spring项目之基于Aspectj的AOP操作（XML配置方式）
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:50&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:51
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79165528" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79165528</a></p>
+<p><strong>前言：</strong></p>
+<p>本文将使用Intellij IDEA 创建项目的方式讲解Spring基于AspectJ的AOP操作</p>
+<p><strong>环境说明：</strong></p>
+<ul>
+<li>Intellij IDEA 2017 CI</li>
+</ul>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p><strong>1、新建Spring项目</strong></p>
+<p>新建Spring项目<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgyNjM2NjIy?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>填写项目名称和项目路径<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgyNzQ0MjE5?x-oss-process=image/format,png" alt="这里写图片描述"><br>Finish</p>
+<p><strong>2、创建相关类</strong></p>
+<p>Book类：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgzMDM2OTcw?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<pre><code>public class Book {
+
+    public void add(){
+        System.out.println(&quot;Book  add()........&quot;);
+    }
+}</code></pre><p>MyBook类：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgzMzU5MDI0?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<pre><code>public class MyBook {
+
+    public void before(){
+        System.out.println(&quot;前置增强........&quot;);
+    }
+
+}</code></pre><p><strong>3、创建applicationCOntext.xml配置文件</strong></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgzNTEzNTUw?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><strong>4、配置对象</strong></p>
+<pre><code>&lt;!--1 配置对象--&gt;
+    &lt;bean class=&quot;demo.spring.aop.Book&quot; id=&quot;book&quot;&gt;&lt;/bean&gt;
+    &lt;bean class=&quot;demo.spring.aop.MyBook&quot; id=&quot;myBook&quot;&gt;&lt;/bean&gt;</code></pre><p><strong>5、配置AOP操作</strong></p>
+<pre><code>&lt;!--2 配置AOP操作--&gt;
+    &lt;aop:config&gt;
+        &lt;!--配置切入点--&gt;
+        &lt;aop:pointcut id=&quot;pointcut&quot; expression=&quot;execution(* demo.spring.aop.Book.add(..))&quot;/&gt;
+        &lt;!--配置切面
+            把增强用到方法上面
+        --&gt;
+        &lt;aop:aspect ref=&quot;myBook&quot;&gt;
+            &lt;!--配置增强类型--&gt;
+            &lt;aop:before method=&quot;before&quot; pointcut-ref=&quot;pointcut&quot;/&gt;
+        &lt;/aop:aspect&gt;
+    &lt;/aop:config&gt;
+</code></pre><p>applicationContext.xml配置文件：<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTgzODI4Nzg3?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><strong>6、创建测试类，并编写测试方法</strong></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg0MDQ1MTk1?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>TestAop类：</p>
+<pre><code>import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestAop {
+
+    @Test
+    public void test(){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Book book = (Book) applicationContext.getBean(&quot;book&quot;);
+        book.add();
+    }
+}</code></pre><p><strong>7、运行测试方法</strong></p>
+<p>测试不成功<br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg0MjA3Mzcw?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>此刻我们看下错误原因：<br>通过错误信息可以看到，最后一部分提示如下：</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg0MzI3Mjkw?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<pre><code>Caused by: java.lang.ClassNotFoundException: org.aspectj.weaver.reflect.ReflectionWorld$ReflectionWorldException
+    at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+    at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+    at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:335)
+    at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+    ... 70 more
+</code></pre><p>相关类找不到</p>
+<p><strong>8、解决测试异常</strong></p>
+<p>类找不到，其实就是没有导入相关的jar包，根据提示信息可以看到找不到XXX-aspectj-weaver-XXX相关的jar包</p>
+<p>到官网下载XXX-aspectj-weaver-XXX相关的jar包</p>
+<p>导入到lib文件目录</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg0NzA5OTg5?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><strong>9、build path</strong></p>
+<p>在添加了jar包后，Intellij IDEA不会自动给我们build进去，</p>
+<p>下面我们手动build</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg0OTI1MjI1?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg1MDA5Njc3?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+<p>apply-&gt;OK </p>
+<p><strong>10、测试</strong></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTg1MTE5ODc2?x-oss-process=image/format,png" alt="这里写图片描述"><br>测试成功。</p>
+<p><strong>注：</strong></p>
+<p>本文测试了前置增强，其他的几种增强的操作相同，就只有在配置文件的时候配置不同。</p>
+<h2 id="其他几种增强"><a href="#其他几种增强" class="headerlink" title="其他几种增强"></a>其他几种增强</h2><p>Book类：</p>
+<pre><code>public class Book {
+
+    public void add(){
+        System.out.println(&quot;Book  add()........&quot;);
+    }
+}</code></pre><p>MyBook类：</p>
+<pre><code>public class MyBook {
+
+    //前置增强
+    public void before(){
+        System.out.println(&quot;前置增强........&quot;);
+    }
+
+    //后置增强
+    public void after(){
+        System.out.println(&quot;后置增强........&quot;);
+    }
+
+    //环绕增强
+    public void arround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        //方法之前执行的代码
+        System.out.println(&quot;环绕增强 方法之前执行........&quot;);
+
+        //执行被增强的方法
+        proceedingJoinPoint.proceed();
+
+        //方法之后执行的代码
+        System.out.println(&quot;环绕增强 方法之后执行........&quot;);
+    }
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+
+    &lt;!--1 配置对象--&gt;
+    &lt;bean class=&quot;demo.spring.aop.Book&quot; id=&quot;book&quot;&gt;&lt;/bean&gt;
+    &lt;bean class=&quot;demo.spring.aop.MyBook&quot; id=&quot;myBook&quot;&gt;&lt;/bean&gt;
+
+    &lt;!--2 配置AOP操作--&gt;
+    &lt;aop:config&gt;
+        &lt;!--配置切入点--&gt;
+        &lt;aop:pointcut id=&quot;pointcut&quot; expression=&quot;execution(* demo.spring.aop.Book.add(..))&quot;/&gt;
+        &lt;!--配置切面
+            把增强用到方法上面
+        --&gt;
+        &lt;aop:aspect ref=&quot;myBook&quot;&gt;
+            &lt;!--配置增强类型--&gt;
+
+            &lt;!--前置增强--&gt;
+            &lt;aop:before method=&quot;before&quot; pointcut-ref=&quot;pointcut&quot;/&gt;
+
+            &lt;!--后置增强--&gt;
+            &lt;aop:after-returning method=&quot;after&quot; pointcut-ref=&quot;pointcut&quot;/&gt;
+
+            &lt;!--环绕增强--&gt;
+            &lt;aop:around method=&quot;arround&quot; pointcut-ref=&quot;pointcut&quot;/&gt;
+
+        &lt;/aop:aspect&gt;
+    &lt;/aop:config&gt;
+
+&lt;/beans&gt;</code></pre><p>TestAop类，测试方法：</p>
+<pre><code>import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestAop {
+
+    @Test
+    public void test(){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Book book = (Book) applicationContext.getBean(&quot;book&quot;);
+        book.add();
+    }
+}
+</code></pre><p><strong>测试：</strong><br><img src="https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTI1MTkwMjQzMTk3?x-oss-process=image/format,png" alt="这里写图片描述"></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
