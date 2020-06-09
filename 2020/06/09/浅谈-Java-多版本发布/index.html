@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            浅谈 Java 多版本发布
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:37&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:37
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/106317776" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/106317776</a></p>
+<h1 id="1-契约精神"><a href="#1-契约精神" class="headerlink" title="1. 契约精神"></a>1. 契约精神</h1><p>什么是契约？</p>
+<p>百度百科：<a href="https://baike.baidu.com/item/%E5%A5%91%E7%BA%A6/2874688" target="_blank" rel="noopener">https://baike.baidu.com/item/%E5%A5%91%E7%BA%A6/2874688</a><br>维基百科：<a href="https://zh.wikipedia.org/zh/%E5%A5%91%E7%BA%A6" target="_blank" rel="noopener">https://zh.wikipedia.org/zh/%E5%A5%91%E7%BA%A6</a></p>
+<p>相关概念：</p>
+<ul>
+<li>Design by Contract （契约式设计）</li>
+<li>Contract-First (契约先行)</li>
+</ul>
+<h1 id="2-版本号"><a href="#2-版本号" class="headerlink" title="2. 版本号"></a>2. 版本号</h1><p><a href="https://www.zhihu.com/question/20289602" target="_blank" rel="noopener">软件的版本号是如何定义的？- 知乎</a></p>
+<h1 id="3-一方库版本设计"><a href="#3-一方库版本设计" class="headerlink" title="3. 一方库版本设计"></a>3. 一方库版本设计</h1><p>一方库：本工程中的各模块的相互依赖</p>
+<p>推荐方案：</p>
+<ul>
+<li>版本统一</li>
+<li>顶层 pom 定义版本</li>
+<li>子随父：child module 沿用 parent module 版本</li>
+</ul>
+<p>版本管理：</p>
+<p>Maven 项目，建议采用 Maven Version Plugin 统一管理升级。</p>
+<p>发布：</p>
+<p>无需发布，项目内引用。</p>
+<h1 id="4-二方库版本设计"><a href="#4-二方库版本设计" class="headerlink" title="4. 二方库版本设计"></a>4. 二方库版本设计</h1><p>二方库：公司内部的依赖库，一般指公司内部的其他项目发布的 jar 包</p>
+<p>推荐方案：</p>
+<ul>
+<li>基于版本号，多版本发布</li>
+<li>高版本向下兼容</li>
+</ul>
+<p>发布：</p>
+<p>Maven 私服发布，多版本代码发布。</p>
+<h2 id="4-1-理解“高版本向下兼容”"><a href="#4-1-理解“高版本向下兼容”" class="headerlink" title="4.1. 理解“高版本向下兼容”"></a>4.1. 理解“高版本向下兼容”</h2><ul>
+<li>对“修改、删除”关闭，对“新增”开放</li>
+</ul>
+<p>旧版本：</p>
+<pre><code class="json">{
+    &quot;name&quot;:&quot;Bob&quot;,
+    &quot;age&quot;:20
+}</code></pre>
+<p>向下兼容新版本 - <code>新增</code></p>
+<pre><code class="json">{
+    &quot;name&quot;:&quot;Alice&quot;,
+    &quot;age&quot;:18,
+    &quot;address&quot;:&quot;Beijing&quot;
+}</code></pre>
+<p>非向下兼容新版本 - <code>修改</code></p>
+<pre><code class="json">{
+    &quot;newName&quot;:&quot;Alice&quot;,
+    &quot;age&quot;:18
+}</code></pre>
+<p>非向下兼容新版本 - <code>删除</code></p>
+<pre><code class="json">{
+    &quot;age&quot;:18
+}</code></pre>
+<p><strong>极端情况</strong></p>
+<p>如果整个契约变动很大，并不满足 “向下兼容”，建议新建 API，<code>path</code> 采用 <code>v1</code>, <code>v2</code> 等字样区分。</p>
+<h1 id="5-三方库版本设计"><a href="#5-三方库版本设计" class="headerlink" title="5. 三方库版本设计"></a>5. 三方库版本设计</h1><p>三方库：公司之外的开源库， 比如 apache、ibm、google 等发布的依赖</p>
+<p>推荐方案：</p>
+<p>同二方库版本设计，需要更加注重版本，严格落实 “基于版本研发”。</p>
+<p>发布：</p>
+<p>Maven 私服 / 中央仓库 / Jar 包 多版本代码发布。</p>
+<h1 id="6-Web-API-版本设计"><a href="#6-Web-API-版本设计" class="headerlink" title="6. Web API 版本设计"></a>6. Web API 版本设计</h1><p>背景：调用方多样性（H5 无版本、移动终端有版本），但通信协议一致。</p>
+<p>推荐方案：</p>
+<p>参考三方库版本设计</p>
+<p>发布：</p>
+<p>自建服务器发布，“伪多版本发布” （发行版为最新版本，向下兼容多版本）</p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
