@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Spring的Bean管理（XML配置文件方式）
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 20:41&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 20:42
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79150162" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79150162</a></p>
+<h2 id="bean实例化三种方法"><a href="#bean实例化三种方法" class="headerlink" title="bean实例化三种方法"></a>bean实例化三种方法</h2><p>在spring里面通过配置文件创建对象<br>bean实例化三种方式实现：</p>
+<p><strong>第一种：使用类的无参数构造创建（重点）</strong></p>
+<p>需要在类中有无参构造函数,如果类中没有无参数构造，出现异常</p>
+<p>User类：</p>
+<pre><code>public class User{
+    public void add(){
+        System.out.println(&quot;add()方法&quot;);
+    }
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;bean id=&quot;user&quot; class=&quot;User全路径&quot;&gt;&lt;/bean&gt;</code></pre><p>测试类的测试方法：</p>
+<pre><code>public void testUser(){
+    //1、加载spring配置文件，根据创建对象
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+    //2、得到配置创建的对象
+    User user = (User) context.getBean(&quot;user&quot;);
+    user.add();
+}</code></pre><p><strong>第二种：使用静态工厂创建</strong></p>
+<p>创建静态的方法，返回类对象</p>
+<p>User类：</p>
+<pre><code>public class User{
+    public void add(){
+        System.out.println(&quot;add().......&quot;);
+    }
+}</code></pre><p>UserFactory类：</p>
+<pre><code>public class UserFactory{
+    public static User getUser(){
+        return new User();
+    }
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;bean id=&quot;user&quot; class=&quot;UserFactory全路径&quot; factory-method=&quot;getUser&quot;&gt;&lt;/bean&gt;</code></pre><p>测试方法：</p>
+<pre><code>public void testUser(){
+    //1、加载spring配置文件，根据创建对象
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+    //2、得到配置创建的对象
+    User user = (User) context.getBean(&quot;user&quot;);
+    user.add();
+}</code></pre><p><strong>第三种：使用实例工厂创建</strong></p>
+<p>创建不是静态的方法，返回类对象</p>
+<p>User类：</p>
+<pre><code>public class User{
+    public void add(){
+        System.out.println(&quot;add().......&quot;);
+    }
+}</code></pre><p>UserFactory类：</p>
+<pre><code>public class UserFactory{
+    public User getUser(){
+        return new User();
+    }
+}</code></pre><p>applicationContext.xml配置文件：</p>
+<pre><code>&lt;bean id=&quot;userFactory&quot; class=&quot;UserFactory全路径&quot;&gt;&lt;/bean&gt;
+&lt;bean id=&quot;user&quot; factory-bean=&quot;userFactory&quot; factory-method=&quot;getUser&quot;&gt;&lt;/bean&gt;</code></pre><p>测试方法：</p>
+<pre><code>public void testUser(){
+    //1、加载spring配置文件，根据创建对象
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+    //2、得到配置创建的对象
+    User user = (User) context.getBean(&quot;user&quot;);
+    user.add();
+}</code></pre><h2 id="bean标签常用属性"><a href="#bean标签常用属性" class="headerlink" title="bean标签常用属性"></a>bean标签常用属性</h2><p><strong>1、id属性</strong></p>
+<ul>
+<li>起名称，唯一标识，可任意命名</li>
+<li>id属性值不能包含特殊符号</li>
+<li>根据id能得到配置对象</li>
+</ul>
+<p><strong>2、class属性</strong></p>
+<ul>
+<li>创建对象所在类的全路径</li>
+</ul>
+<p><strong>3、name属性</strong></p>
+<ul>
+<li>功能和id属性一样，id属性值不能包含特殊符号但name属性值可以包含特殊符号</li>
+</ul>
+<p><strong>4、scope属性</strong></p>
+<ul>
+<li>1）singleton属性值（掌握）：默认值，单例</li>
+<li>2）prototype属性值（掌握）：多例</li>
+<li>3）request属性值(了解）：创建对象，把对象放到request域里</li>
+<li>4）session属性值(了解）：创建对象，把对象放到session域里</li>
+<li>5）globalSession属性值(了解）：创建对象，把对象放到globalSession域里</li>
+</ul>
+<p><strong>注：</strong></p>
+<p>本文乃是我自学时所做笔记，不足之处，多多指点，谢谢。</p>
+<p><em>了解更多内容，欢迎关注我的博客专栏：</em><br><a href="http://blog.csdn.net/column/details/19029.html" target="_blank" rel="noopener">Java Engineer</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
