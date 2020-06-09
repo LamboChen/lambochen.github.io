@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【Kafka】Kafka入门手记
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:31&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>本文为 Kafka 入门笔记，主要包括 Kafka 单节点部署、生产消费消息，以及新手踩坑记录。</p>
+<p>Kafka 作为大数据必备组件、消息中间件必学的 Apache 顶级开源项目，服务稳定、高吞吐的流数据处理平台。具体介绍可查看文末参考文档。</p>
+<p><strong>目前 CSDN 暂不支持 markdown 收缩语句块，对于文章展示方面略有问题</strong></p>
+<h2 id="1-1-可查看美观版本"><a href="#1-1-可查看美观版本" class="headerlink" title="1.1. 可查看美观版本"></a>1.1. 可查看美观版本</h2><p>文档：Kafka 入门手记.md<br>链接：<a href="http://note.youdao.com/noteshare?id=d1c65daf3c137f29a860b5efd5dff944&sub=F4E6A5E5FB3946499E7C4C3E6022E1DC" target="_blank" rel="noopener">http://note.youdao.com/noteshare?id=d1c65daf3c137f29a860b5efd5dff944&amp;sub=F4E6A5E5FB3946499E7C4C3E6022E1DC</a></p>
+<h1 id="2-Kafka单节点部署"><a href="#2-Kafka单节点部署" class="headerlink" title="2. Kafka单节点部署"></a>2. Kafka单节点部署</h1><h2 id="2-1-下载"><a href="#2-1-下载" class="headerlink" title="2.1. 下载"></a>2.1. 下载</h2><p><a href="http://kafka.apache.org/" target="_blank" rel="noopener">http://kafka.apache.org</a></p>
+<p>选择合适版本即可，这里选择最新版本。Linux 环境。</p>
+<h2 id="2-2-解压"><a href="#2-2-解压" class="headerlink" title="2.2. 解压"></a>2.2. 解压</h2><p>Kafka 安装包 后缀为 <code>.tgz</code> ， 解压即可。</p>
+<pre><code class="shell">tar -zxvf kafka_package.tgz</code></pre>
+<p>其中，<code>kafka_package.tgz</code> 是 Kafka 安装包名称。</p>
+<h3 id="2-2-1-zookeeper-安装"><a href="#2-2-1-zookeeper-安装" class="headerlink" title="2.2.1. zookeeper 安装"></a>2.2.1. zookeeper 安装</h3><p>Kafka 依赖于 zookeeper（ZK） 支持，本文直接采用 Kafka 安装包自带的 zookeeper。</p>
+<p>也可以单独部署 zookeeper，使用方式一样。对于 生产环境，建议单独搭建 zookeeper。</p>
+<h2 id="2-3-配置"><a href="#2-3-配置" class="headerlink" title="2.3. 配置"></a>2.3. 配置</h2><h3 id="2-3-1-zookeeper"><a href="#2-3-1-zookeeper" class="headerlink" title="2.3.1. zookeeper"></a>2.3.1. zookeeper</h3><p>进入 Kafka 解压包根目录，<code>config</code> 文件夹下的即为 Kafka 提供的默认配置文件。</p>
+<p>此处我们修改下 <code>zookeeper.properties</code> 的 <code>host</code> 信息。此处修改 <code>host</code> 配置，主要是为了避免在使用 Java 客户端连接解析为 localhost  </p>
+<pre><code class="shell">host.name=your_ip
+advertised.host.name=your_ip</code></pre>
+<p>其中，<code>your_ip</code> 配置为服务器外网 IP。 </p>
+<h3 id="2-3-2-Kafka"><a href="#2-3-2-Kafka" class="headerlink" title="2.3.2. Kafka"></a>2.3.2. Kafka</h3><p>同样在 <code>config</code> 配置文件下修改 <code>server.properties</code> 文件即可。</p>
+<p>主要配置如下：</p>
+<pre><code class="shell"># 监听
+listeners=PLAINTEXT://服务器内网IP:9092
+
+# 以下两项类似 zookeeper 配置
+advertised.listeners=PLAINTEXT://服务器外网IP:9092
+host.name=外网IP
+
+# zookeeper 连接信息
+zookeeper.connect=zookeeper服务器IP:2181</code></pre>
+<h2 id="2-4-启动"><a href="#2-4-启动" class="headerlink" title="2.4. 启动"></a>2.4. 启动</h2><p>先启动 zookeeper，因为 Kafka 启动的时候会连接注册 zookeeper。</p>
+<h3 id="2-4-1-zookeeper"><a href="#2-4-1-zookeeper" class="headerlink" title="2.4.1. zookeeper"></a>2.4.1. zookeeper</h3><p>启动 zookeeper，<em>在 Kafka 根目录执行</em></p>
+<pre><code class="shell">./bin/zookeeper-server-start.sh ./config/zookeeper.properties</code></pre>
+<p>上述方式，会占有 shell 客户端窗口，如果想后台启动，添加参数 <code>daemon</code> 即可</p>
+<pre><code class="shell">./bin/zookeeper-server-start.sh -daemon ./config/zookeeper.properties</code></pre>
+<h3 id="2-4-2-kafka"><a href="#2-4-2-kafka" class="headerlink" title="2.4.2. kafka"></a>2.4.2. kafka</h3><p>类似 zookeeper 启动。</p>
+<pre><code class="shell">./bin/kafka-server-start.sh ./config/server.properties</code></pre>
+<p>后台启动：</p>
+<pre><code class="shell">./bin/kafka-server-start.sh -daemon ./config/server.properties</code></pre>
+<p>此时 Kafka 单节点部署就已经完成了，通过 <code>ps -ef | grep zookeeper</code>, <code>ps -ef | grep kafka</code> 看到对应进程，证明启动成功。</p>
+<h2 id="2-5-topic"><a href="#2-5-topic" class="headerlink" title="2.5. topic"></a>2.5. topic</h2><h3 id="2-5-1-创建-topic"><a href="#2-5-1-创建-topic" class="headerlink" title="2.5.1. 创建 topic"></a>2.5.1. 创建 topic</h3><p>通过 Kafka 提供的脚本文件，即可创建。在 Kafka 根目录下执行：</p>
+<pre><code class="shell">./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic topic_name</code></pre>
+<p>1）指定 zk 为 localhost:2181<br>2）副本因子为 1，即不需要副本<br>3）partition 数量为 3<br>4）topic 名称为 top_name</p>
+<h3 id="2-5-2-查看-topic"><a href="#2-5-2-查看-topic" class="headerlink" title="2.5.2. 查看 topic"></a>2.5.2. 查看 topic</h3><pre><code class="shell">./bin/kafka-topics.sh --list --zookeeper localhost:2181</code></pre>
+<p>1)  list 命令用于查看<br>2）需要指定 zk</p>
+<h2 id="2-6-生产消费"><a href="#2-6-生产消费" class="headerlink" title="2.6. 生产消费"></a>2.6. 生产消费</h2><p>此处直接通过 Kafka 提供的简单客户端进行生产消费数据。</p>
+<h3 id="2-6-1-生产"><a href="#2-6-1-生产" class="headerlink" title="2.6.1. 生产"></a>2.6.1. 生产</h3><p>1、启动简单 producer</p>
+<pre><code class="shell">./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic_name</code></pre>
+<p>1） –broker-list  指定 Kafka 的地址及端口<br>2）–topic 指定具体 topic_name</p>
+<p>2、 生产消息</p>
+<p>直接在 producer 窗口输入消息即可，消息是否发送成功，直接在 consumer 窗口即可查看。</p>
+<h3 id="2-6-2-消费"><a href="#2-6-2-消费" class="headerlink" title="2.6.2. 消费"></a>2.6.2. 消费</h3><p>1、启动简单 consumer</p>
+<pre><code class="shell">./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic topic_name --from-beginning</code></pre>
+<p>1）–bootstrap-server 指定 Kafka 地址及端口<br>2）– topic 指定 topic<br>3）–from-beginning 表示指定从 offset 从头开始消费</p>
+<p>2、消费数据</p>
+<p>直接在 producer 窗口发送消息，然后切换至 consumer 窗口，查看是否成功消费消息。</p>
+<h1 id="3-Java-Client-生产消费"><a href="#3-Java-Client-生产消费" class="headerlink" title="3. Java Client 生产消费"></a>3. Java Client 生产消费</h1><p>此步基于 SpringBoot 进行搭建 demo 项目。 SpringBoot 版本为 2.x</p>
+<h2 id="3-1-新建-SpringBoot-项目"><a href="#3-1-新建-SpringBoot-项目" class="headerlink" title="3.1. 新建 SpringBoot 项目"></a>3.1. 新建 SpringBoot 项目</h2><p>直接通过 spring.starter 创建即可。完整项目： <a href="https://github.com/LamboChen/demo/tree/master/kafka" target="_blank" rel="noopener">lambochen/demo/kafka</a></p>
+<h3 id="3-1-1-引入依赖"><a href="#3-1-1-引入依赖" class="headerlink" title="3.1.1. 引入依赖"></a>3.1.1. 引入依赖</h3><p>Kafka 依赖：</p>
+<pre><code class="shell">&lt;!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;
+    &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;
+    &lt;version&gt;2.3.1&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.kafka&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-kafka&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+<h2 id="3-2-Kafka-配置"><a href="#3-2-Kafka-配置" class="headerlink" title="3.2. Kafka 配置"></a>3.2. Kafka 配置</h2><h3 id="3-2-1-producer"><a href="#3-2-1-producer" class="headerlink" title="3.2.1. producer"></a>3.2.1. producer</h3><p>1、<code>application.properties</code> 配置</p>
+<pre><code class="shell">kafka.producer.servers=kafka服务器IP:服务器端口号
+kafka.producer.retries=0
+kafka.producer.batch.size=4096
+kafka.producer.linger=1
+kafka.producer.buffer.memory=40960
+
+kafka.topic.default=topic名称</code></pre>
+<p>2、<code>ProducerFactory</code>, <code>KafkaTemplate</code> 配置：</p>
+<pre><code class="java">public Map&lt;String, Object&gt; producerConfigs() {
+    Map&lt;String, Object&gt; props = new LinkedHashMap&lt;&gt;();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+    props.put(ProducerConfig.RETRIES_CONFIG, retries);
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG,batchSize);
+    props.put(ProducerConfig.LINGER_MS_CONFIG,linger);
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG,bufferMemory);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
+    return props;
+}
+
+public ProducerFactory&lt;String, MessageEntity&gt; producerFactory(){
+    return new DefaultKafkaProducerFactory&lt;&gt;(
+            producerConfigs(),
+            new StringSerializer(),
+            new JsonSerializer&lt;MessageEntity&gt;());
+}
+
+@Bean(&quot;kafkaTemplate&quot;)
+public KafkaTemplate&lt;String, MessageEntity&gt; kafkaTemplate() {
+    return new KafkaTemplate&lt;&gt;(producerFactory());
+}</code></pre>
+<h3 id="3-2-2-consumer"><a href="#3-2-2-consumer" class="headerlink" title="3.2.2. consumer"></a>3.2.2. consumer</h3><p>1、<code>application.properties</code> 配置</p>
+<pre><code class="shell">kafka.consumer.zookeeper.connect=ZK服务器端口:ZK端口
+kafka.consumer.servers=Kafka服务器IP:Kafka端口
+kafka.consumer.enable.auto.commit=true
+kafka.consumer.session.timeout=6000
+kafka.consumer.auto.commit.interval=100
+kafka.consumer.auto.offset.reset=latest
+kafka.consumer.topic=topic名称
+kafka.consumer.group.id=consumerGroup名称
+kafka.consumer.concurrency=10</code></pre>
+<p>2、<code>KafkaListenerContainerFactory</code> 配置</p>
+<pre><code class="java">public KafkaListenerContainerFactory&lt;ConcurrentMessageListenerContainer&lt;String, MessageEntity&gt;&gt;
+kafkaListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory&lt;String, MessageEntity&gt; factory =
+            new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
+    factory.setConsumerFactory(consumerFactory());
+    factory.setConcurrency(concurrency);
+    factory.getContainerProperties().setPollTimeout(1500);
+    return factory;
+}
+
+private ConsumerFactory&lt;String, MessageEntity&gt; consumerFactory() {
+    return new DefaultKafkaConsumerFactory&lt;&gt;(
+            consumerConfigs(),
+            new StringDeserializer(),
+            new JsonDeserializer&lt;&gt;(MessageEntity.class)
+    );
+}
+
+private Map&lt;String, Object&gt; consumerConfigs() {
+    Map&lt;String, Object&gt; propsMap = new HashMap&lt;&gt;();
+    propsMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+    propsMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommit);
+    propsMap.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
+    propsMap.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeout);
+    propsMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+    propsMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
+    return propsMap;
+}</code></pre>
+<h3 id="3-2-3-ProducerCallBack"><a href="#3-2-3-ProducerCallBack" class="headerlink" title="3.2.3. ProducerCallBack"></a>3.2.3. ProducerCallBack</h3><p>生产回调，主要用于生产者发送消息后的处理。此 demo 仅作日志记录。</p>
+<p>需要集成 <code>ListenableFutureCallback</code> ，并指定消息实体类型。</p>
+<pre><code class="java">public class ProducerCallback implements ListenableFutureCallback&lt;SendResult&lt;String, MessageEntity&gt;&gt; </code></pre>
+<p>其中， <code>MessageEntity</code> 为消息实体类型。</p>
+<h2 id="3-3-生产消息"><a href="#3-3-生产消息" class="headerlink" title="3.3. 生产消息"></a>3.3. 生产消息</h2><p>创建 <code>ProducerRecord</code> 消息，通过 <code>KafkaTemplate</code> 发送即可。</p>
+<pre><code class="java">@Autowired
+@Qualifier(&quot;kafkaTemplate&quot;)
+private KafkaTemplate&lt;String, MessageEntity&gt; kafkaTemplate;
+
+public void send(String topic, MessageEntity message) {
+    kafkaTemplate.send(topic, message);
+}
+
+public void send(String topic, String key, MessageEntity message) {
+    ProducerRecord&lt;String, MessageEntity&gt; record = new ProducerRecord&lt;&gt;(topic, key, message);
+    long startTime = System.currentTimeMillis();
+    ListenableFuture&lt;SendResult&lt;String, MessageEntity&gt;&gt; future = kafkaTemplate.send(record);
+    future.addCallback(new ProducerCallback(startTime, key, message));
+
+}</code></pre>
+<h2 id="3-4-消费消息"><a href="#3-4-消费消息" class="headerlink" title="3.4. 消费消息"></a>3.4. 消费消息</h2><p>消费消息，通过 <code>@KafkaConsumer</code> 注解即可实现。</p>
+<pre><code class="java">@KafkaListener(topics = &quot;${kafka.topic.default}&quot;, containerFactory = &quot;kafkaListenerContainerFactory&quot;)
+public void consumer(MessageEntity message){
+    log.info(&quot;consumer: &quot; + gson.toJson(message));
+}</code></pre>
+<h2 id="3-5-测试"><a href="#3-5-测试" class="headerlink" title="3.5. 测试"></a>3.5. 测试</h2><p>启动 SpringBoot 项目，通过提供的 controller 进行请求生产消息。</p>
+<p>查看日志，成功记录消息内容，即为生产、消费成功。</p>
+<p><em>到此为止，Kafka demo 应用已完成啦</em></p>
+<h1 id="4-踩坑记录"><a href="#4-踩坑记录" class="headerlink" title="4. 踩坑记录"></a>4. 踩坑记录</h1><h2 id="4-1-打印日志"><a href="#4-1-打印日志" class="headerlink" title="4.1. 打印日志"></a>4.1. 打印日志</h2><p>我在刚开始建好项目、配置 Kafka 后，启动项目失败，无日志输出，不好排查问题。</p>
+<p>设置日志 level， <code>application.properties</code> 文件配置：</p>
+<pre><code class="shell">logging.level.root=debug</code></pre>
+<h2 id="4-2-kafka-启动内存不足"><a href="#4-2-kafka-启动内存不足" class="headerlink" title="4.2. kafka 启动内存不足"></a>4.2. kafka 启动内存不足</h2><p><a href="https://blog.csdn.net/gywtzh0889/article/details/51773536" target="_blank" rel="noopener">kafka 启动 报错cannot allocate memory，即内存不足</a></p>
+<h2 id="4-3-java-client-连接失败"><a href="#4-3-java-client-连接失败" class="headerlink" title="4.3. java client 连接失败"></a>4.3. java client 连接失败</h2><p>按照本教程配置，已经避免了这个问题。</p>
+<p><a href="https://blog.csdn.net/gywtzh0889/article/details/51773536" target="_blank" rel="noopener">【kafka】Java连接出现Connection refused: no further information</a></p>
+<h1 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h1><ul>
+<li><a href="http://kafka.apache.org/" target="_blank" rel="noopener">Kafka 官网 http://kafka.apache.org</a></li>
+<li><a href="http://kafka.apachecn.org/" target="_blank" rel="noopener">Kafka 官方文档</a></li>
+<li><a href="https://www.imooc.com/learn/1043" target="_blank" rel="noopener">Kafka 流处理平台 - imooc.com </a></li>
+<li><a href="https://www.orchome.com/kafka/index" target="_blank" rel="noopener">kafka 教程 - orchome</a></li>
+<li><a href="https://blog.csdn.net/l1028386804/article/details/78348367" target="_blank" rel="noopener">kafka 单节点安装教程</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

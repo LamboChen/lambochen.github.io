@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【DFS】深度优先搜索递归方式讲解
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/08 Mon 01:53&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>[TOC]</p>
+<p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/79717835" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/79717835</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>记得第一次接触到DFS还是在去年大概三四月份，当时也是在准备比赛的时候听说DFS很重要（原谅我是个小白），然后就去Google了一波什么叫做DFS，当时的我刚开始学习C++，还没有学习数据结构，讲道理当时我看懂了算法原理，但是对于什么图呀，树呀的还真是一窍不通。后边学习了数据结构后，对于DFS原理也是相当的了解（自我感觉），但从来没有总结过，今天主要是进行DFS的算法进行简单的自我总结，一是准备比赛，二是也应该从现在开始正式的拿起数据结构了（原谅我花了半年时间搞web开发去了）。</p>
+<p>———————————————- 以上内容不重要（纯属我自己发牢骚）</p>
+<h2 id="初识DFS"><a href="#初识DFS" class="headerlink" title="初识DFS"></a>初识DFS</h2><p>什么是DFS？Depth First Search英文的缩写，翻译过来就是“深度优先搜索”。</p>
+<p>从名字上我们可以大概的看出，DFS主要是一种搜索算法，按照深度优先的方式</p>
+<blockquote>
+<p>深度优先搜索算法（英语：Depth-First-Search，简称DFS）是一种用于遍历或搜索树或图的算法。沿着树的深度遍历树的节点，尽可能深的搜索树的分支。当节点v的所在边都己被探寻过，搜索将回溯到发现节点v的那条边的起始节点。这一过程一直进行到已发现从源节点可达的所有节点为止。如果还存在未被发现的节点，则选择其中一个作为源节点并重复以上过程，整个进程反复进行直到所有节点都被访问为止。属于盲目搜索。</p>
+</blockquote>
+<p>主要思想：不撞南墙不回头。</p>
+<blockquote>
+<p>深度优先遍历的主要思想就是：首先以一个未被访问过的顶点作为起始顶点，沿当前顶点的边走到未访问过的顶点；当没有未访问过的顶点时，则回到上一个顶点，继续试探访问别的顶点，直到所有的顶点都被访问。</p>
+</blockquote>
+<blockquote>
+<p>沿着某条路径遍历直到末端，然后回溯，再沿着另一条进行同样的遍历，直到所有的顶点都被访问过为止。</p>
+</blockquote>
+<p>【以上引用来自维基百科】</p>
+<p><strong>小结：</strong></p>
+<p>深度优先搜索——类似于树的先根遍历，是树的先根遍历的推广</p>
+<p>简述算法过程</p>
+<ul>
+<li>1、任选一顶点作始点 v ，访问该顶点</li>
+<li>2、沿深度方向，依次遍历 v 的未访问邻接点——直到本次遍历结束</li>
+<li>3、一次遍历完时，若有未访问顶点：任选一个未访问顶点作起始点，GOTO第二步</li>
+</ul>
+<h2 id="算法演示"><a href="#算法演示" class="headerlink" title="算法演示"></a>算法演示</h2><p><strong>递归伪代码演示</strong></p>
+<pre><code>DFS(dep,、、、）        //dep代表目前DFS的深度
+{
+    if(找到解 || 走不下去){
+        、、、     //在此处进行相应的操作
+        return ;
+    }
+    枚举下一种情况，DFS（dep+1,、、、）
+}</code></pre><p><strong>递归伪代码演示</strong>（稍微详细点，其实都是一样的）</p>
+<pre><code>bool visited[MAXNODE];        //顶点的访问标识数组
+void DFSInit(Graph G){
+    for(i=0; i&lt;G.VertexNum; i++){
+        visited[i] = false;
+    }
+}
+
+void DFS(Graph G,int v){  //v:顶点数组中的序号
+    Visit[v];  visited[v]=true;
+    w = FirstAdj(G,v);    //返回：v的第一个邻接点，0表示无邻接点
+    while(w!=0){   
+        if(!visited[w]{
+            DFS(G,w);   //参数传递w-&gt;v
+        }
+        w = NextAdj(G,v,w);   //返回：v的在邻接点w后的邻接点，0表示不存在
+    }
+}    </code></pre><p><strong>DFS遍历——图解过程</strong></p>
+<p><img src="https://img-blog.csdn.net/20180327185247135?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"></p>
+<p>注：</p>
+<ul>
+<li>存储结构不确定，遍历结果不唯一</li>
+<li>其中一种DFS序列：DFS(G,v1) = (v1,v2,v3,v6,v5,v7,v4,v8,v9)</li>
+</ul>
+<p><strong>小结</strong></p>
+<p>从图解和伪代码中我们可以看出，DFS其实就是找准一条路径（我们可以暂且这样认为），一直走下去（深度优先），直到满足条件（这属于运气好了）或者走投无路、走不下去（撞南墙了）。如果没有找到相应的结果状态，那么就回退一步（回溯），再进行下一步找路径，再撞再回溯，一直到找到目标状态或者所有情况都遍历完，程序结束</p>
+<h2 id="DFS递归算法框架"><a href="#DFS递归算法框架" class="headerlink" title="DFS递归算法框架"></a>DFS递归算法框架</h2><pre><code>/*
+该DFS 框架以2D 坐标范围为例，来体现DFS 算法的实现思想。
+*/
+#include&lt;cstdio&gt;
+#include&lt;cstring&gt;
+#include&lt;cstdlib&gt;
+using namespace std;
+const int maxn=100;
+bool vst[maxn][maxn]; // 访问标记
+int map[maxn][maxn]; // 坐标范围
+int dir[4][2]={0,1,0,-1,1,0,-1,0}; // 方向向量，(x,y)周围的四个方向
+
+bool CheckEdge(int x,int y) // 边界条件和约束条件的判断
+{
+    if(!vst[x][y] &amp;&amp; ...) // 满足条件
+        return 1;
+    else // 与约束条件冲突
+        return 0;
+}
+
+void dfs(int x,int y)
+{
+    vst[x][y]=1; // 标记该节点被访问过
+    if(map[x][y]==G) // 出现目标态G
+    {
+        ...... // 做相应处理
+    return;
+    }
+    for(int i=0;i&lt;4;i++)
+    {
+        if(CheckEdge(x+dir[i][0],y+dir[i][1])) // 按照规则生成下一个节点
+        dfs(x+dir[i][0],y+dir[i][1]);
+    }
+    return; // 没有下层搜索节点，回溯
+}
+int main()
+{
+    ......
+    return 0;
+}</code></pre><p>【此框架引用自<a href="https://blog.csdn.net/u011437229/article/details/53188837" target="_blank" rel="noopener">BFS和DFS算法原理（通俗易懂版）</a>】</p>
+<h2 id="DFS递归算法实例讲解"><a href="#DFS递归算法实例讲解" class="headerlink" title="DFS递归算法实例讲解"></a>DFS递归算法实例讲解</h2><p>我一直都认为，对于我们学习技术的学生来说，想要了解一门技术或者一个知识点的，最好的方法是“在理解了理论知识的基础上进行实践”，实践才是检验真理的唯一标准，同时这种实践的方式学习知识点，才是印象最深刻，同时也是提高学习激情和欲望的有效方式。</p>
+<p>话不多说，我们进入实战阶段。</p>
+<p>原题我记不清了，这边就简单的说下题意</p>
+<p>【题目】在给定的一个二维数组中找寻从起点（0，0）开始走，能到达哪些区域（真不记得题意了，大家自行脑补吧）</p>
+<pre><code>0 0 1 1 0
+1 0 0 1 1
+1 1 0 0 0
+1 0 0 1 1
+0 0 1 0 0</code></pre><p>我们假设上边就是输入数据（嘻嘻，将就一下），‘0’代表能够走的，‘1’代表不能走的，可以理解为墙，同时只能在所给的地图上走，也就是不能跳出去再调回来，求解区域</p>
+<p>相信大家对于这个问题其实已经很明确了，其实就和“八连块”问题是一个道理的</p>
+<p>【分析】我们从起点开始走，一直沿着一条路走，一直走到最后走不动的时候，进行回溯，再找寻下一条路线，直到最后没有路走，回到了起点位置（大家可以想想为什么会回到起点位置）结束。我们走过的地方其实就是题目的答案</p>
+<p><strong>源代码</strong></p>
+<p>我建议先自己实现一波后再来看哟。</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;cstring&gt;
+#define N 10
+using namespace std;
+int dir[4][2] = {0,1,0,-1,1,0,-1,0};
+int vst[N][N];        //标记数组 
+int map[N][N];        //给定图 
+bool checkEdge(int x,int y);
+void dfs(int x,int y);
+int main(){
+    int n;
+    cin&gt;&gt;n;
+    memset(vst,0,sizeof(vst));        //初始化 
+    memset(map,-1,sizeof(map));
+    for(int i=0;i&lt;n;i++){
+        for(int j=0;j&lt;n;j++){
+            cin&gt;&gt;map[i][j];        //输入图 
+        }
+    }
+    dfs(0,0);    //进行DFS 
+    for(int i=0;i&lt;n;i++){
+        for(int j=0;j&lt;n;j++){
+//            cout&lt;&lt;vst[i][j]&lt;&lt;&quot; &quot;;
+            if(vst[i][j] == 6){        //找寻到的结果， 
+                cout&lt;&lt;&quot;i:&quot;&lt;&lt;i&lt;&lt;&quot; j:&quot;&lt;&lt;j&lt;&lt;endl;    
+            } 
+        }
+        cout&lt;&lt;endl;
+    }
+    return 0;
+}
+bool checkEdge(int x,int y){    //检验当前点是否可走 
+    if(vst[x][y]==0 &amp;&amp; map[x][y]==0 &amp;&amp; x&gt;=0 &amp;&amp; x&lt;55 &amp;&amp; y&gt;=0 &amp;&amp; y&lt;5){
+        return true;
+    }
+    return false;
+}
+void dfs(int x,int y){
+    vst[x][y] = 6;    
+    for(int i=0;i&lt;4;i++){
+        if(checkEdge(x+dir[i][0],y+dir[i][1])){
+            dfs(x+dir[i][0],y+dir[i][1]);
+        }
+    } 
+    return;
+}</code></pre><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://blog.csdn.net/u011437229/article/details/53188837" target="_blank" rel="noopener">BFS和DFS算法原理（通俗易懂版）</a></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2" target="_blank" rel="noopener">深度优先搜索-维基百科</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

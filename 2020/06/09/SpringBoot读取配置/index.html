@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            SpringBoot读取配置
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:47&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/102646193" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/102646193</a></p>
+<h1 id="1-properties-文件"><a href="#1-properties-文件" class="headerlink" title="1. properties 文件"></a>1. properties 文件</h1><p><strong>对于 properties 文件的读取，采用 @PropertySource 、@Value 注解即可直接获取指定配置项。</strong></p>
+<h2 id="1-1-Value-方式"><a href="#1-1-Value-方式" class="headerlink" title="1.1. @Value 方式"></a>1.1. @Value 方式</h2><p>test-a.properties 文件：</p>
+<pre><code>test.a=测试A</code></pre><p>test-b.properties 文件（<strong>用于测试从不同 properties 文件读取</strong>）：</p>
+<pre><code>test.b=测试B</code></pre><h3 id="1-1-1-配置项读取"><a href="#1-1-1-配置项读取" class="headerlink" title="1.1.1. 配置项读取"></a>1.1.1. 配置项读取</h3><pre><code class="java">@Data
+@PropertySource(value = {&quot;classpath:test-a.properties&quot;, &quot;classpath:test-b.properties&quot;}, encoding = &quot;UTF-8&quot;)
+@Component
+public class PropertiesDemo {
+
+    /**
+     * test-a.properties 文件中 test.a 属性
+     */
+    @Value(&quot;${test.a}&quot;)
+    private String aValue;
+
+    /**
+     * test-b.properties 文件中 test.b 属性
+     */
+    @Value(&quot;${test.b}&quot;)
+    private String bValue;
+
+}</code></pre>
+<p>@Data ： 用于提供 getter，setter。简化代码<br>@PropertySource ： 用于指定 properties 文件，需将 properties 文件放置在 能够获取到路径的地方<br>@Component： 注入 bean ，<strong>不能省略，不然 @Value 注解不能获取到配置项</strong></p>
+<p>测试：</p>
+<p><strong>注意点：单元测试读取的是 test resources 下的配置文件</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20191020103528395.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="1-2-Environment-方式"><a href="#1-2-Environment-方式" class="headerlink" title="1.2.  Environment 方式"></a>1.2.  Environment 方式</h2><p>test-a.properties</p>
+<pre><code>test.environment=Environment方式读取配置文件</code></pre><h3 id="1-2-1-配置项读取"><a href="#1-2-1-配置项读取" class="headerlink" title="1.2.1. 配置项读取"></a>1.2.1. 配置项读取</h3><pre><code class="java">@Component
+@PropertySource(value = {&quot;classpath:test-a.properties&quot;}, encoding = &quot;UTF-8&quot;)
+public class EnvironmentDemo {
+
+    @Autowired
+    private Environment environment;
+
+    public String getEnvironment() {
+        return environment.getProperty(&quot;test.environment&quot;);
+    }
+}</code></pre>
+<p><strong>代码解释：</strong></p>
+<p>@Component ： 注入bean，不可缺少<br>@PropertySource ： 指定配置文件，可指定编码<br>Environment ： 获取配置文件属性的接口<br>getProperty: 获取配置属性，参数为配置属性名</p>
+<p>注意点：同样的需要区分测试资源文件路径</p>
+<h2 id="1-3-ConfigurationProperties-方式获取"><a href="#1-3-ConfigurationProperties-方式获取" class="headerlink" title="1.3. ConfigurationProperties 方式获取"></a>1.3. ConfigurationProperties 方式获取</h2><p>test-c.properties 文件：</p>
+<pre><code>id=1
+name=测试C</code></pre><h3 id="1-3-1-读取配置"><a href="#1-3-1-读取配置" class="headerlink" title="1.3.1. 读取配置"></a>1.3.1. 读取配置</h3><pre><code class="java">@Component
+@ConfigurationProperties
+@PropertySource(value = {&quot;classpath:test-c.properties&quot;}, encoding = &quot;UTF-8&quot;)
+@Data
+public class PropertiesBean {
+
+    /**
+     * ID 对应配置属性：id
+     */
+    private int id;
+
+    /**
+     * name 对应配置属性：name
+     */
+    private String name;
+}</code></pre>
+<p>@Component： 注入bean，不可少<br>@ConfigurationProperties: 进行获取配置，对应属性名称（可指定配置前缀等参数）<br>@PropertySource: 指定文件名，文件编码<br>@Data : 提供 getter ，setter，简化代码</p>
+<p><strong>小结：@Value 的方式获取其实是这种方式的一种泛化方式。@Value 不需要属性名称、字段名称一致，此种方式需要严格一致。</strong></p>
+<p>此种方式也适用于 yml 方式获取。</p>
+<h1 id="2-yml-文件"><a href="#2-yml-文件" class="headerlink" title="2. yml 文件"></a>2. yml 文件</h1><p><strong>前文所说的方法均适用于 yml 文件读取配置属性。</strong></p>
+<p>值得注意的是 @PropertySource 不支持配置 yml 文件，我们可以通过 application.yml 配置活跃 yml 文件进行读取。</p>
+<h2 id="2-1-获取示例"><a href="#2-1-获取示例" class="headerlink" title="2.1. 获取示例"></a>2.1. 获取示例</h2><p>application.yml</p>
+<pre><code class="yml">spring:
+  profiles:
+    active: bob</code></pre>
+<p><strong>bob 表示活跃的配置文件</strong></p>
+<p>application-bob.yml</p>
+<pre><code class="yml">bob:
+  id: 2
+  name: bob姓名</code></pre>
+<p>application.yml , application-bob.yml 对应关系图：</p>
+<p><img src="https://img-blog.csdnimg.cn/20191020111451547.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="2-1-1-获取配置"><a href="#2-1-1-获取配置" class="headerlink" title="2.1.1. 获取配置"></a>2.1.1. 获取配置</h3><pre><code class="java">@Component
+@ConfigurationProperties(prefix = &quot;bob&quot;)
+@Data
+public class YmlDemo {
+
+    /**
+     * 对应 配置文件 bob.id
+     */
+    private int id;
+
+    /**
+     * 对应配置文件 bob.name
+     */
+    private String name;
+
+}</code></pre>
+<p>@Component ： 注入 bean，同样不能少<br>@ConfigurationProperties:  获取配置属性，对应上字段名称。此处指定了 prefix（配置属性前缀）<br>@Data : 提供 getter，setter，简化代码</p>
+<p><strong>注意：此种方式获取，会延用项目编码，不需要进行指定编码。故需将 IDE 和项目编码保持一致，避免中文乱码。</strong></p>
+<h1 id="3-静态字段赋值"><a href="#3-静态字段赋值" class="headerlink" title="3. 静态字段赋值"></a>3. 静态字段赋值</h1><p>细心的大佬可能已经发现，之前的方式全是普通的字段，并不是静态字段。</p>
+<h2 id="3-1-背景说明"><a href="#3-1-背景说明" class="headerlink" title="3.1. 背景说明"></a>3.1. 背景说明</h2><p>Spring 不支持采用 @Value 的方式给静态字段赋值。 意味着我们前边的所有方式都不能使用。（<strong>直接使用不会报错，但是获取不到属性值</strong>）<br>Spring 提供注入方式包括：setter注入、构造器注入等</p>
+<h2 id="3-2-需求"><a href="#3-2-需求" class="headerlink" title="3.2. 需求"></a>3.2. 需求</h2><p>我们需要项目启动时，便给指定的静态字段进行赋值。</p>
+<h2 id="3-3-解决方案"><a href="#3-3-解决方案" class="headerlink" title="3.3. 解决方案"></a>3.3. 解决方案</h2><p>SpringBoot 没有提供 @Value 的方式读取配置属性给静态变量赋值，但是静态变量支持 setter 注入的方式。即通过 @Value 给 setter 注入参数值，再用 setter 给静态变量赋值。即可实现需求。</p>
+<p>properties 文件，延用之前的配置文件</p>
+<h3 id="3-3-1-获取配置"><a href="#3-3-1-获取配置" class="headerlink" title="3.3.1. 获取配置"></a>3.3.1. 获取配置</h3><pre><code class="java">@PropertySource(value = {&quot;classpath:test-a.properties&quot;, &quot;classpath:test-b.properties&quot;}, encoding = &quot;UTF-8&quot;)
+@Component
+public class PropertiesStaticDemo {
+
+    /**
+     * test-a.properties 文件中 test.a 属性
+     */
+    public static String aValue;
+
+    /**
+     * test-b.properties 文件中 test.b 属性
+     */
+    public static String bValue;
+
+    /**
+     * 获取配置文件项 test.a 给参数 aValue 赋值，然后通过方法体给 静态属性 PropertiesStaticDemo.aValue 赋值
+     */
+    @Value(&quot;${test.a}&quot;)
+    public void setAValue(String aValue) {
+        PropertiesStaticDemo.aValue = aValue;
+    }
+
+    @Value(&quot;${test.b}&quot;)
+    public void setBValue(String bValue) {
+        PropertiesStaticDemo.bValue = bValue;
+    }
+}</code></pre>
+<p>注：<br>a.    在全部修改为 static 字段时，也需要保留 @Component 注解<br>b.    @PropertySource 指定配置文件、文件编码</p>
+<h3 id="3-3-2-测试"><a href="#3-3-2-测试" class="headerlink" title="3.3.2. 测试"></a>3.3.2. 测试</h3><pre><code class="java">@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PropertiesStaticTest {
+
+    @Test
+    public void test() {
+        System.out.println(&quot;aValue:&quot; + PropertiesStaticDemo.aValue);
+        System.out.println(&quot;bValue:&quot; + PropertiesStaticDemo.bValue);
+    }
+
+}</code></pre>
+<p>直接通过类名访问。</p>
+<h1 id="4-小结"><a href="#4-小结" class="headerlink" title="4. 小结"></a>4. 小结</h1><p>properties、yml 两个文件的读取原理一样的，只是对应的活跃文件指定方式略有区别。</p>
+<p>对于静态属性的赋值，主要是采用 setter 的方式，巧妙的曲线救国。</p>
+<p>知识有限，有错有漏欢迎评论指正。谢谢。</p>
+<h1 id="5-完整代码"><a href="#5-完整代码" class="headerlink" title="5. 完整代码"></a>5. 完整代码</h1><p><a href="https://github.com/LamboChen/demo/tree/master/rambo" target="_blank" rel="noopener">https://github.com/LamboChen/demo</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://docs.spring.io/spring-boot/docs/2.1.9.RELEASE/reference/html/common-application-properties.html" target="_blank" rel="noopener">Appendix A. Common application properties</a></li>
+<li><a href="https://blog.csdn.net/dkbnull/article/details/81953190" target="_blank" rel="noopener">Spring Boot读取properties配置文件中的数据</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【Java 8】FutureTask、CompletableFuture实践案例
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:50&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家：<a href="https://blog.csdn.net/chensanwa/article/details/101320914" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/101320914</a></p>
+<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>Java 8 更新了很多特性，其中 Lambda、stream API 等，其中 CompletableFuture 也是 Java 8 新特性之一，旨在对 Java 异步编程提供良好的 API。本文主要讲解 CompletableFuture 的简单使用。如果想了解其原理，请移步文末 “参考”。 </p>
+<h1 id="2-demo-代码"><a href="#2-demo-代码" class="headerlink" title="2. demo 代码"></a>2. demo 代码</h1><p>首先，我们先创建 demo 代码。<strong>当然，完全同步执行。</strong></p>
+<p><strong>依赖，jdk 1.8</strong></p>
+<h2 id="2-1-定义耗时操作"><a href="#2-1-定义耗时操作" class="headerlink" title="2.1. 定义耗时操作"></a>2.1. 定义耗时操作</h2><pre><code class="java">/**
+ * 生产者，比作需要提前进行执行的操作
+ * @return
+ */
+public int provider() throws InterruptedException {
+    log.info(&quot;provider time={}&quot;, System.currentTimeMillis());
+    // 模拟耗时操作
+    Thread.sleep(3000);
+    return 1;
+}
+
+/**
+ * 消费者，耗时操作
+ */
+public int consumer(int message) throws InterruptedException {
+    log.info(&quot;consumer time={}&quot;,System.currentTimeMillis());
+    // 模拟耗时操作
+    Thread.sleep(3000);
+    log.info(&quot;consumer message={}, time={}&quot;,message, System.currentTimeMillis());
+    return message * 2;
+}</code></pre>
+<h2 id="2-2-同步代码"><a href="#2-2-同步代码" class="headerlink" title="2.2. 同步代码"></a>2.2. 同步代码</h2><p>进行两次生产两次消费</p>
+<pre><code class="java">/**
+ * 同步版本
+ */
+@Test
+public void sync() throws InterruptedException {
+    long startTime = System.currentTimeMillis();
+
+    int oneProviderResult = provider();
+    int twoProviderResult = provider();
+    int oneConsumerResult = consumer(oneProviderResult);
+    int twoConsumerResult = consumer(twoProviderResult);
+    log.info(&quot;sync: one={}, two={}&quot;, oneConsumerResult, twoConsumerResult);
+
+    long endTime = System.currentTimeMillis();
+    log.info(&quot;sync time={}&quot;, (endTime - startTime));
+}</code></pre>
+<h3 id="2-2-1-运行日志"><a href="#2-2-1-运行日志" class="headerlink" title="2.2.1. 运行日志"></a>2.2.1. 运行日志</h3><pre><code>00:21:18.230 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569342078225
+00:21:21.242 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569342081242
+00:21:24.243 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569342084243
+00:21:27.243 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569342087243
+00:21:27.243 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569342087243
+00:21:30.244 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569342090244
+00:21:30.244 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - sync: one=2, two=2
+00:21:30.244 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - sync time=12019</code></pre><p><strong>日志分析：</strong></p>
+<p>从日志中可以看出，先进行两次 provider, 然后两次 consumer , 然后打印结果、耗时。</p>
+<p>程序正常运行，总耗时为 12019 ms，即 两次 provider 6000ms，两次 consumer 6000ms，加上其它开销可忽略不计。</p>
+<h2 id="2-3-同步代码另一种写法"><a href="#2-3-同步代码另一种写法" class="headerlink" title="2.3. 同步代码另一种写法"></a>2.3. 同步代码另一种写法</h2><p>当然，满足需求的代码，还有另一种更为简洁的写法，几乎不需要中间变量。</p>
+<pre><code class="java">/**
+ * 同步版本
+ */
+@Test
+public void syncOther() throws InterruptedException {
+    long startTime = System.currentTimeMillis();
+
+    log.info(&quot;syncOther: one={}, two={}&quot;,consumer(provider()), consumer(provider()));
+
+    log.info(&quot;syncOther: time={}&quot;, System.currentTimeMillis() - startTime);
+}</code></pre>
+<h3 id="2-3-1-运行日志"><a href="#2-3-1-运行日志" class="headerlink" title="2.3.1. 运行日志"></a>2.3.1. 运行日志</h3><pre><code>00:29:14.839 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569342554835
+00:29:17.866 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569342557866
+00:29:20.867 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569342560867
+00:29:20.867 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569342560867
+00:29:23.867 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569342563867
+00:29:26.884 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569342566884
+00:29:26.884 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - syncOther: one=2, two=2
+00:29:26.884 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - syncOther: time=12049</code></pre><p><strong>日志分析：</strong></p>
+<p>从日志中看出，先进行 provider, 然后一次 consumer, 然后一次 provider，然后一次 consumer，然后打印结果、耗时。</p>
+<p>执行结果和之前版本一样，耗时一样（12 s），只是执行顺序改变。</p>
+<h1 id="3-FutureTask版本"><a href="#3-FutureTask版本" class="headerlink" title="3. FutureTask版本"></a>3. FutureTask版本</h1><p>对于之前的版本，实现了功能，但对性能来讲耗时较为严重。</p>
+<h2 id="3-1-异步分析"><a href="#3-1-异步分析" class="headerlink" title="3.1. 异步分析"></a>3.1. 异步分析</h2><p>就该程序而言，主要流程是进行两次 provider，每个 provider 的结果提交给 consumer，所有的耗时操作都是 3000 ms。</p>
+<p>其实就两次 provider 来讲，目前的执行流程是串行执行，即一个 provider 执行完成后再执行另一个 provider 。从数据上来讲，第二个 provider 的执行应该不依赖另一个 provider 的执行，即他们可以并行执行。</p>
+<p>同样的对于两个 consumer ，假设其数据依赖都已经准备完成，两个 consumer 同样应该并行执行。</p>
+<p>对于 provider 和 consumer ，其相互之间存在数据依赖，业务上来讲应该串行执行。</p>
+<p>分析得：两个 provider 并行执行，两个 consumer 并行执行，provider 和 consumer 串行执行。<br>耗时：两个 provider 并行执行耗时 3000 ms，两个 consumer 并行执行耗时 3000 ms，总耗时 6000 ms。</p>
+<p>分析上来讲，相较于同步版本，耗时减少一半。那我们来进行实现。</p>
+<h2 id="3-2-FutureTask-版本"><a href="#3-2-FutureTask-版本" class="headerlink" title="3.2. FutureTask 版本"></a>3.2. FutureTask 版本</h2><p>直接上代码</p>
+<pre><code class="java">/**
+ * FutureTask 版本
+ */
+@Test
+public void futureTask() throws ExecutionException, InterruptedException {
+    long startTime = System.currentTimeMillis();
+
+    ExecutorService executor = Executors.newCachedThreadPool();
+    // 创建 provider 任务
+    FutureTask&lt;Integer&gt; oneFuture = new FutureTask&lt;&gt;(() -&gt; provider());
+    FutureTask&lt;Integer&gt; twoFuture = new FutureTask&lt;&gt;(() -&gt; provider());
+    // 提交 provider 任务
+    executor.submit(oneFuture);
+    executor.submit(twoFuture);
+    // 获取中间数据
+    Integer oneProviderResult = oneFuture.get();
+    Integer twoProviderResult = twoFuture.get();
+
+    // 创建 consumer 任务
+    FutureTask&lt;Integer&gt; threeFuture = new FutureTask&lt;&gt;(() -&gt; consumer(oneProviderResult));
+    FutureTask&lt;Integer&gt; fourFuture = new FutureTask&lt;&gt;(() -&gt; consumer(twoProviderResult));
+    // 提交 consumer 任务
+    executor.submit(threeFuture);
+    executor.submit(fourFuture);
+    // 获取结果
+    Integer oneConsumerResult = threeFuture.get();
+    Integer twoConsumerResult = fourFuture.get();
+
+    log.info(&quot;sync: one={}, two={}&quot;, oneConsumerResult, twoConsumerResult);
+
+    log.info(&quot;syncOther: time={}&quot;, System.currentTimeMillis() - startTime);
+}</code></pre>
+<p>代码说明：</p>
+<ul>
+<li>此处采用了 Executors.newCachedThreadPool() 线程池，并采用默认配置。实际项目中，建议自定义线程池或者进行参数配置。</li>
+<li>在 consumer 中直接使用了全局变量（中间数据结果），建议实际项目中不采用这种写法。</li>
+<li>每一个任务流程：创建任务、提交任务、任务执行、获取任务结果</li>
+</ul>
+<h3 id="3-2-1-日志分析"><a href="#3-2-1-日志分析" class="headerlink" title="3.2.1. 日志分析"></a>3.2.1. 日志分析</h3><pre><code>00:58:13.849 [pool-1-thread-1] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569344293845
+00:58:13.849 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569344293848
+00:58:16.856 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569344296856
+00:58:16.856 [pool-1-thread-1] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569344296856
+00:58:19.856 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569344299856
+00:58:19.856 [pool-1-thread-1] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569344299856
+00:58:19.856 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - sync: one=2, two=2
+00:58:19.856 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - syncOther: time=6117</code></pre><p><strong>日志分析：</strong></p>
+<p>可以看到，先执行两个 provider，然后两个 consumer ，然后打印结果、耗时。</p>
+<p>似乎和之前的同步版本没什么区别。我们细细观察，总耗时 6117 ms , 减少了一半。和我们之前分析结果相符。</p>
+<p>再细细观察，两个 provider 打印时间几乎相同、两个 consumer 打印时间完全相同。可以看出，两个 provider 并行执行，两个 consumer 并行执行。和我们的预期相符。</p>
+<h3 id="3-2-2-异步分析"><a href="#3-2-2-异步分析" class="headerlink" title="3.2.2. 异步分析"></a>3.2.2. 异步分析</h3><p>从 FutureTask 代码中可以看出，我们进行了 provider 创建任务后，手动进行了提交任务，然后手动进行了 get （此处的 get() 是一个阻塞操作），获取到数据后才进行 consumer 任务的创建、提交、运行、获取结果。</p>
+<p>那么，可以让这一切自动化么？即，provider 创建任务、提交执行、执行、获取结果，提交给 consumer 任务执行。且看下文 CompletableFuture （这是正菜）。</p>
+<h1 id="4-CompletableFuture"><a href="#4-CompletableFuture" class="headerlink" title="4. CompletableFuture"></a>4. CompletableFuture</h1><p>废话不多说，直接上代码：</p>
+<pre><code class="java">/**
+ * CompletableFuture 版本
+ */
+@Test
+public void completableFutureTest() throws ExecutionException, InterruptedException {
+    long startTime = System.currentTimeMillis();
+
+    ExecutorService executor = Executors.newCachedThreadPool();
+    CompletableFuture&lt;Integer&gt; one = CompletableFuture
+            .supplyAsync(() -&gt; {
+                try {
+                    return provider();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor)
+            .thenApplyAsync((res) -&gt; {
+                try {
+                    return consumer(res);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor);
+
+    CompletableFuture&lt;Integer&gt; two = CompletableFuture
+            .supplyAsync(() -&gt; {
+                try {
+                    return provider();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor)
+            .thenApplyAsync((res) -&gt; {
+                try {
+                    return consumer(res);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor);
+
+    /**
+     * 等待执行，需要等待 one, two 两个任务均执行完毕
+     */
+    CompletableFuture.allOf(one, two);
+
+    log.info(&quot;sync: one={}, two={}&quot;, one.get(), two.get());
+
+    log.info(&quot;syncOther: time={}&quot;, System.currentTimeMillis() - startTime);
+}</code></pre>
+<h2 id="4-1-日志分析"><a href="#4-1-日志分析" class="headerlink" title="4.1. 日志分析"></a>4.1. 日志分析</h2><pre><code>01:19:24.956 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569345564953
+01:19:24.956 [pool-1-thread-1] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - provider time=1569345564953
+01:19:27.965 [pool-1-thread-3] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569345567965
+01:19:27.971 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer time=1569345567971
+01:19:30.966 [pool-1-thread-3] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569345570966
+01:19:30.971 [pool-1-thread-2] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - consumer message=1, time=1569345570971
+01:19:30.971 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - sync: one=2, two=2
+01:19:30.971 [main] INFO club.chenlinghong.demo.javaeight.completablefuture.CompletableFutureDemo - syncOther: time=6201</code></pre><p>同 FutureTask 版本，两个 provider 异步执行耗时 3000 ms, 两个 consumer 异步执行耗时 3000 ms ，总耗时 6000 ms。</p>
+<p>其它耗时如线程池创建、线程创建、赋值操作等可忽略不计。</p>
+<h2 id="4-2-FutureTask-VS-CompletableFuture"><a href="#4-2-FutureTask-VS-CompletableFuture" class="headerlink" title="4.2. FutureTask VS CompletableFuture"></a>4.2. FutureTask VS CompletableFuture</h2><p>两个异步版本对比来看，对于当前实例，差别不大。</p>
+<p>CompletableFuture 相较于 FutureTask ，此实践使用到的是 <strong>主动计算</strong> 的特性，多个异步任务之间依赖执行，自动通知下一个任务执行。</p>
+<p>CompletableFuture 相较于 FutureTask ，还使用到了多个任务编排，此实践使用的是 <strong>allOf()</strong>，即多个任务都必须执行完毕。较长用于最后进行等待。另外，还有比如 any 之类的编排 API 。</p>
+<h2 id="4-3-简化代码"><a href="#4-3-简化代码" class="headerlink" title="4.3. 简化代码"></a>4.3. 简化代码</h2><p>当然，上述 CompletableFuture 代码太过冗余，可以简化下。</p>
+<pre><code class="java">// 公共
+ExecutorService executor = Executors.newCachedThreadPool();
+
+/**
+ * CompletableFuture 版本
+ */
+@Test
+public void completableFutureTest_01() throws ExecutionException, InterruptedException {
+    long startTime = System.currentTimeMillis();
+
+    CompletableFuture&lt;Integer&gt; one = completableFutureExecute();
+    CompletableFuture&lt;Integer&gt; two = completableFutureExecute();
+    /**
+     * 等待执行，需要等待 one, two 两个任务均执行完毕
+     */
+    CompletableFuture.allOf(one, two);
+    log.info(&quot;sync: one={}, two={}&quot;, one.get(), two.get());
+
+    log.info(&quot;syncOther: time={}&quot;, System.currentTimeMillis() - startTime);
+}
+
+// 抽象
+private CompletableFuture&lt;Integer&gt; completableFutureExecute() {
+    return CompletableFuture
+            .supplyAsync(() -&gt; {
+                try {
+                    return provider();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor)
+            .thenApplyAsync((res) -&gt; {
+                try {
+                    return consumer(res);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }, executor);
+}</code></pre>
+<h1 id="5-完整代码"><a href="#5-完整代码" class="headerlink" title="5. 完整代码"></a>5. 完整代码</h1><p><a href="https://github.com/lambochen/demo/blob/master/javaeight/src/main/java/club/chenlinghong/demo/javaeight/completablefuture/CompletableFutureDemo.java" target="_blank" rel="noopener">https://github.com/lambochen/demo</a></p>
+<h1 id="6-参考"><a href="#6-参考" class="headerlink" title="6. 参考"></a>6. 参考</h1><ul>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" target="_blank" rel="noopener">CompletableFuture - Oracle</a></li>
+<li><a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/FutureTask.html" target="_blank" rel="noopener">FutureTask - Oracle</a> </li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

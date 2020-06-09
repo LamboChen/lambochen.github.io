@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【maven】多 module项目搭建
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:26&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>本着 “ 干货的定义，往往都是基于某种特定场景 ” 的原则，开篇之前，先来点前戏：</p>
+<ul>
+<li>只讲 maven 工程实践，不谈 maven 原理</li>
+<li>主要内容<ul>
+<li>多 module 项目搭建</li>
+<li>bom 模块搭建</li>
+</ul>
+</li>
+<li>环境介绍<ul>
+<li>IDE： Intellij IDEA</li>
+<li>语言： Java</li>
+<li>maven 已安装</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-单一-module-项目"><a href="#2-单一-module-项目" class="headerlink" title="2. 单一 module 项目"></a>2. 单一 module 项目</h1><h2 id="2-1-IDEA-创建项目"><a href="#2-1-IDEA-创建项目" class="headerlink" title="2.1. IDEA 创建项目"></a>2.1. IDEA 创建项目</h2><p>话不多说，上图：<br><img src="https://img-blog.csdnimg.cn/20200319210638475.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>创建 maven 或者 Spring Initializer 均可。我这里采用后者进行创建。</p>
+<h2 id="2-2-maven-命令创建"><a href="#2-2-maven-命令创建" class="headerlink" title="2.2. maven 命令创建"></a>2.2. maven 命令创建</h2><p>进入自己的工作目录，输入命令：</p>
+<pre><code class="shell">mvn archetype:generate \
+ -DgroupId=club.chenlinghong.demo \
+ -DartifactId=maven-demo \
+ -Dversion=0.0.1-SNAPSHOT \
+ -Dpackage=club.chenlinghong.demo.maven</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>groupId: 组织ID，建议用 “域名反写” ，如： club.chenlinghong.demo [域名：chenlinghong.club， 项目域名：demo]</li>
+<li>artifactId:  建议采用项目名称</li>
+<li>version: 版本号</li>
+<li>package: 包名，包路径</li>
+</ul>
+<h2 id="2-3-maven-项目结构"><a href="#2-3-maven-项目结构" class="headerlink" title="2.3. maven 项目结构"></a>2.3. maven 项目结构</h2><p>创建项目后，大概是：<br><img src="https://img-blog.csdnimg.cn/20200319211603432.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>图片中，还包含了一些关于 IDE 特有的信息，我一般都会直接删除。</p>
+<p><strong>各文件介绍：</strong></p>
+<ul>
+<li>src 【源码文件夹】<ul>
+<li>main【主文件夹】<ul>
+<li>java 【Java 源码】</li>
+<li>resources 【配置文件夹】</li>
+</ul>
+</li>
+<li>test【测试文件夹】<ul>
+<li>Java 【Java 测试代码】</li>
+<li>resources 【测试配置】</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>.gitignore【项目采用了 git 管理，用于忽略一些本地文件】</li>
+<li>pom.xml 【maven 配置文件】</li>
+</ul>
+<h1 id="3-多-module-项目"><a href="#3-多-module-项目" class="headerlink" title="3. 多 module 项目"></a>3. 多 module 项目</h1><h2 id="3-1-创建顶层-module"><a href="#3-1-创建顶层-module" class="headerlink" title="3.1. 创建顶层 module"></a>3.1. 创建顶层 module</h2><p>可以延用前文 “单一 module 项目”，咱们把 <code>src</code> 删除。 </p>
+<p>在 顶层 module 中，咱们一般用于聚合多 module，较少放 <code>src</code> 代码。 当然，也是可以有 src 源码的哈</p>
+<p>删除 src 后， 就只有一个 <code>pom.xml</code> </p>
+<p>然后，修改 <code>pom.xml</code> 的 <code>packaging</code> 为 <code>pom</code>， 默认是 <code>jar</code>.</p>
+<p>完整 pom.xml 文件：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-demo&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+    &lt;packaging&gt;pom&lt;/packaging&gt;
+&lt;/project&gt;</code></pre>
+<h2 id="3-2-添加子-module"><a href="#3-2-添加子-module" class="headerlink" title="3.2. 添加子 module"></a>3.2. 添加子 module</h2><p>这个步骤比较简单，直接基于 <code>顶层 module</code> 创建即可，类似于创建单一 module 项目.</p>
+<p>此处演示，创建三个 module：</p>
+<ul>
+<li>maven-demo<ul>
+<li>maven-demo-web</li>
+<li>maven-demo-service</li>
+<li>maven-demo-dao</li>
+</ul>
+</li>
+</ul>
+<p>经典的三层架构：</p>
+<ul>
+<li>maven-demo： 主项目</li>
+<li>maven-demo-web: web层</li>
+<li>maven-demo-service：业务逻辑层</li>
+<li>maven-demo-dao： 持久化层</li>
+</ul>
+<p><strong>聚合项目配置：</strong></p>
+<p>在父 module: maven-demo 中配置：</p>
+<pre><code class="xml">&lt;modules&gt;
+    &lt;module&gt;maven-demo-web&lt;/module&gt;
+    &lt;module&gt;maven-demo-service&lt;/module&gt;
+    &lt;module&gt;maven-demo-dao&lt;/module&gt;
+&lt;/modules&gt;</code></pre>
+<p>在各个子 module 中配置：</p>
+<pre><code class="xml">&lt;parent&gt;
+    &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-demo&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+    &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;
+&lt;/parent&gt;</code></pre>
+<p>此时，maven 多 module 项目简版就算是搭建完成。</p>
+<ul>
+<li>顶层 pom 聚合了三个无依赖关系的 maven 项目</li>
+</ul>
+<h2 id="3-3-module-版本管理"><a href="#3-3-module-版本管理" class="headerlink" title="3.3. module 版本管理"></a>3.3. module 版本管理</h2><p>接着上边的项目，如果我想在 <code>maven-demo-web</code> module 中引用 <code>maven-demo-service</code> module，可以采用：</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-demo-service&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>咱们在同一个项目中，其他 module 修改了版本号，还需要在依赖 module 中修改，实在是不符合咱们程序员改变世界的初衷呀（万事从简嘛）</p>
+<p>来，在顶层 pom 中配置下 <code>dependenciesManagement</code> ：</p>
+<pre><code class="xml">&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-demo-service&lt;/artifactId&gt;
+            &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;</code></pre>
+<p>鉴于篇幅原因，配置一个来表示下。那咱们就可以在 <code>maven-demo-web</code> 模块中，简单引入：</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-demo-service&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+<p>至此，咱们就把多 module 之间的依赖关系给配置了，并且进行了依赖管理。 </p>
+<p>怎么测试呢？直接在最底层的 module 中创建一个 Class ，然后在依赖的 module 中尝试 new 一下，就 ok。</p>
+<h1 id="4-bom-项目"><a href="#4-bom-项目" class="headerlink" title="4. bom 项目"></a>4. bom 项目</h1><h2 id="4-1-bom-搭建"><a href="#4-1-bom-搭建" class="headerlink" title="4.1. bom 搭建"></a>4.1. bom 搭建</h2><p>想必，接触过 Spring， SpringBoot 项目的同学，都看到过，在创建 Spring 项目后，就会有一个是 spring 提供的 pom 或者叫做 maven 坐标的 parent.。具体为：</p>
+<pre><code class="xml">&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;2.2.1.RELEASE&lt;/version&gt;
+    &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;</code></pre>
+<p>看到没？其实很熟悉是吧？</p>
+<p>上文中在创建多 module 的时候，也有在子 module 中写过这个 <code>parent</code> 的标签。</p>
+<p>其实，这两个的实现原理，是一样的。咱们也来搞一个试试：咱们这里偷个懒，就不单独创建项目了，直接在 <code>maven-demo</code> 项目下创建 <code>maven-demo-bom</code> 即可：</p>
+<p>1、此项目，不需要 src，直接干掉。 </p>
+<p>2、配置 <code>pom.xml</code>，设置 <code>packaging</code> 为 <code>pom</code>， 这步，很关键、很关键，能否被其他项目采用 <code>parent</code> 方式引入，全靠这个配置。</p>
+<p> 此时，咱们的 bom 已经制作完成，只不过，啥都没有。 咱们来加一些 <code>dependency</code>, <code>dependenciesManagement</code>。 </p>
+<p>示例 bom :</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;club.chenlinghong.demo&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-demo&lt;/artifactId&gt;
+        &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;maven-demo-bom&lt;/artifactId&gt;
+
+    &lt;packaging&gt;pom&lt;/packaging&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;4.13&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;mysql&lt;/groupId&gt;
+                &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+                &lt;version&gt;8.0.18&lt;/version&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+&lt;/project&gt;</code></pre>
+<h2 id="4-2-打包"><a href="#4-2-打包" class="headerlink" title="4.2. 打包"></a>4.2. 打包</h2><p>现在 bom 已经制作好了，但是现在只能在 当前项目中 采用 parent 方式引入。</p>
+<p>若期望其他项目，其他人也能够引入，那就需要把 bom 发布到 maven 仓库中（本地仓库、远程仓库均可，本地仓库则本地访问，远程仓库则其他人都可以访问）。</p>
+<p>直接采用 <code>mvn install</code> 即可发布本地仓库，<code>mvn deploy</code> 发布远程仓库。如果想发布到 maven 官方中央仓库，那就需要去 maven 官网申请账号。</p>
+<p>ok，完美收官！！！</p>
+<h1 id="5-相关链接"><a href="#5-相关链接" class="headerlink" title="5. 相关链接"></a>5. 相关链接</h1><ul>
+<li>完整代码：<a href="https://github.com/LamboChen/demo/tree/master/maven-demo" target="_blank" rel="noopener">LamboChen/maven-demo</a></li>
+<li>《Maven官方文档》目录指南：<a href="http://ifeve.com/maven-index-2/" target="_blank" rel="noopener">http://ifeve.com/maven-index-2</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

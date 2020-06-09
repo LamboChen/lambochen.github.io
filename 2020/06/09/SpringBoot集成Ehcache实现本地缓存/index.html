@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            SpringBoot集成Ehcache实现本地缓存
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:55&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/101041746" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/101041746</a></p>
+<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>Ehcache 作为本地缓存，接入简单。<br>想了解更多知识，可 Google 下 Ehcache，Redis， memcache 等的区别。</p>
+<p>我们今天主要将实操，SpringBoot 集成 Ehcache 实现本地缓存。</p>
+<h1 id="2-搭建SpringBoot项目"><a href="#2-搭建SpringBoot项目" class="headerlink" title="2. 搭建SpringBoot项目"></a>2. 搭建SpringBoot项目</h1><p>Intellij IDEA 一路 next 或者 <a href="https://spring.io" target="_blank" rel="noopener">spring.io</a></p>
+<h3 id="2-1-引入依赖"><a href="#2-1-引入依赖" class="headerlink" title="2.1 引入依赖"></a>2.1 引入依赖</h3><p>springBoot 相关依赖</p>
+<pre><code class="xml">&lt;!-- starter --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- 测试 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- web --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- 缓存支持，超级重要 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-cache&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+<p>ehcache 依赖，重头戏</p>
+<pre><code class="xml">&lt;!-- https://mvnrepository.com/artifact/org.ehcache/ehcache --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.ehcache&lt;/groupId&gt;
+    &lt;artifactId&gt;ehcache&lt;/artifactId&gt;
+    &lt;version&gt;3.8.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>cache-api 提供基于JSR-107的缓存规范</p>
+<pre><code class="xml">&lt;!-- https://mvnrepository.com/artifact/javax.cache/cache-api --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;javax.cache&lt;/groupId&gt;
+    &lt;artifactId&gt;cache-api&lt;/artifactId&gt;
+    &lt;version&gt;1.1.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>lombok 用于简化代码</p>
+<pre><code class="xml">&lt;!-- https://mvnrepository.com/artifact/org.projectlombok/lombok --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+    &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+    &lt;version&gt;1.18.10&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+<p>工具类，提高效率</p>
+<pre><code class="xml">&lt;!-- https://mvnrepository.com/artifact/com.google.guava/guava --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+    &lt;artifactId&gt;guava&lt;/artifactId&gt;
+    &lt;version&gt;23.0&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.commons&lt;/groupId&gt;
+    &lt;artifactId&gt;commons-lang3&lt;/artifactId&gt;
+    &lt;version&gt;3.9&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.commons&lt;/groupId&gt;
+    &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt;
+    &lt;version&gt;4.4&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<h3 id="2-2-编写业务类"><a href="#2-2-编写业务类" class="headerlink" title="2.2. 编写业务类"></a>2.2. 编写业务类</h3><p>实体类。采用 Lombok 简化代码</p>
+<pre><code class="java">@Data
+@NoArgsConstructor
+@AllArgsConstructor
+/**
+ * 建造者模式 链式调用
+ */
+@Accessors(chain = true)
+public class User implements Serializable {
+
+    private static final long serialVersionUID = -8451701378160929387L;
+
+    /**
+     * 用户ID
+     */
+    private Integer id;
+
+    /**
+     * 用户name
+     */
+    private String name;
+}</code></pre>
+<p>仓库类。为简化代码（懒得搭建数据库及连接池），基于 ConcurrentMap 实现的内存数据库。采用 Slf4j 做日志支持，采用 PostConstruct 做初始化调用。</p>
+<pre><code class="java">@Slf4j
+@Component
+public class UserRepository {
+
+    /**
+     * 内存数据库
+     */
+    private Map&lt;Integer, User&gt; userMap = Maps.newConcurrentMap();
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    private void init() {
+        userMap.put(1, new User(1, &quot;Alice&quot;));
+        userMap.put(2, new User(2, &quot;Bob&quot;));
+    }
+
+    public User getById(Integer id) {
+        log.info(&quot;UserRepository#getById: id={}&quot;, id);
+        return userMap.get(id);
+    }
+
+}</code></pre>
+<p>用户服务类。简单调用，进行日志记录</p>
+<pre><code class="java">@Slf4j
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public User getById(Integer id) {
+        log.info(&quot;UserService#getById: id={}&quot;, id);
+        return userRepository.getById(id);
+    }
+}</code></pre>
+<p>web 类。提供路由，采用 Validator 做参数校验，接口采用 RESTful 风格。</p>
+<pre><code class="java">@RestController
+@RequestMapping(&quot;/user&quot;)
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    /**
+     * 根据ID获取用户信息
+     * @param id
+     * @return
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public User getById(@PathVariable(value = &quot;id&quot;)
+                            @NonNull @Min(value = 1, message = &quot;id 为非负数&quot;) Integer id) {
+        return userService.getById(id);
+    }
+
+}</code></pre>
+<h1 id="3-配置-Ehcache"><a href="#3-配置-Ehcache" class="headerlink" title="3. 配置 Ehcache"></a>3. 配置 Ehcache</h1><p>基于前文已经进行了依赖的引入，配置 Ehcache 较为简单。</p>
+<p>application.yml 配置 Ehcache 配置文件路径，方便 SpringBoot 扫描到配置文件。其中， ehcache.xml 为 Ehcache 配置文件名称。</p>
+<pre><code class="yml">spring:
+  cache:
+    jcache:
+      config: classpath:ehcache.xml</code></pre>
+<p>配置 Listener，目前进行日志记录。</p>
+<pre><code class="java">@Slf4j
+public class CacheEventLogger implements CacheEventListener&lt;Object, Object&gt; {
+
+    @Override
+    public void onEvent(CacheEvent&lt;?, ?&gt; cacheEvent) {
+        log.info(&quot;cache event logger: type={}, key={}, oldValue={}, newValue={}&quot;,
+                cacheEvent.getType(),
+                cacheEvent.getKey(),
+                cacheEvent.getOldValue(),
+                cacheEvent.getNewValue());
+    }
+}</code></pre>
+<p>配置 Ehcache </p>
+<pre><code class="xml">&lt;config xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+        xmlns=&quot;http://www.ehcache.org/v3&quot;
+        xmlns:jsr107=&quot;http://www.ehcache.org/v3/jsr107&quot;
+        xsi:schemaLocation=&quot;
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd&quot;&gt;
+    &lt;service&gt;
+        &lt;jsr107:defaults enable-statistics=&quot;true&quot;/&gt;
+    &lt;/service&gt;
+
+    &lt;!-- user 为该缓存名称 对应@Cacheable的属性cacheNames--&gt;
+    &lt;cache alias=&quot;user&quot;&gt;
+        &lt;!-- 指定缓存 key 类型，对应@Cacheable的属性key --&gt;
+        &lt;key-type&gt;java.lang.Integer&lt;/key-type&gt;
+        &lt;!-- 配置value类型 --&gt;
+        &lt;value-type&gt;club.chenlinghong.demo.ehcache.entity.User&lt;/value-type&gt;
+        &lt;expiry&gt;
+            &lt;!-- 缓存 ttl --&gt;
+            &lt;ttl unit=&quot;minutes&quot;&gt;1&lt;/ttl&gt;
+        &lt;/expiry&gt;
+        &lt;listeners&gt;
+            &lt;listener&gt;
+                &lt;!-- 配置Listener --&gt;
+                &lt;class&gt;club.chenlinghong.demo.ehcache.listener.CacheEventLogger&lt;/class&gt;
+                &lt;event-firing-mode&gt;ASYNCHRONOUS&lt;/event-firing-mode&gt;
+                &lt;event-ordering-mode&gt;UNORDERED&lt;/event-ordering-mode&gt;
+                &lt;events-to-fire-on&gt;CREATED&lt;/events-to-fire-on&gt;
+                &lt;events-to-fire-on&gt;UPDATED&lt;/events-to-fire-on&gt;
+                &lt;events-to-fire-on&gt;EXPIRED&lt;/events-to-fire-on&gt;
+                &lt;events-to-fire-on&gt;REMOVED&lt;/events-to-fire-on&gt;
+                &lt;events-to-fire-on&gt;EVICTED&lt;/events-to-fire-on&gt;
+            &lt;/listener&gt;
+        &lt;/listeners&gt;
+        &lt;resources&gt;
+            &lt;!-- 分配资源大小 --&gt;
+            &lt;heap unit=&quot;entries&quot;&gt;2000&lt;/heap&gt;
+            &lt;offheap unit=&quot;MB&quot;&gt;100&lt;/offheap&gt;
+        &lt;/resources&gt;
+    &lt;/cache&gt;
+&lt;/config&gt;</code></pre>
+<p>@EnableCaching 开启缓存支持</p>
+<pre><code>@SpringBootApplication
+@EnableCaching
+public class EhcacheApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EhcacheApplication.class, args);
+    }
+
+}</code></pre><h1 id="4-使用-Ehcache"><a href="#4-使用-Ehcache" class="headerlink" title="4. 使用 Ehcache"></a>4. 使用 Ehcache</h1><p>使用较为简单，只需要在需要使用缓存的地方添加注解 @Cacheable ，以及配置相应属性项即可</p>
+<p>一般我们会分析业务，对于一些耗时较长，并且数据不易改变的接口请求做缓存处理。此处我们对 UserRepository 做缓存，用户信息一般不易改变，满足缓存的条件；另一方面，用户信息一般存储在数据库、磁盘中，访问耗时较长，有做缓存的必要。</p>
+<pre><code class="java">@Slf4j
+@Component
+public class UserRepository {
+
+    /**
+     * 内存数据库
+     */
+    private Map&lt;Integer, User&gt; userMap = Maps.newConcurrentMap();
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    private void init() {
+        userMap.put(1, new User(1, &quot;Alice&quot;));
+        userMap.put(2, new User(2, &quot;Bob&quot;));
+    }
+
+    /**
+     * 此处的 cacheNames 需要和 ehcache 配置文件的配置项一致
+     */
+    @Cacheable(cacheNames = &quot;user&quot;, key = &quot;#id&quot;)
+    public User getById(Integer id) {
+        log.info(&quot;UserRepository#getById: id={}&quot;, id);
+        return userMap.get(id);
+    }
+
+}</code></pre>
+<p>完整代码：<a href="https://github.com/chenlinghong/demo/tree/master/ehcache" target="_blank" rel="noopener">https://github.com/chenlinghong/demo</a></p>
+<h1 id="5-测试"><a href="#5-测试" class="headerlink" title="5. 测试"></a>5. 测试</h1><p>此时我们运行项目，直接通过浏览器、Postman 进行测试，并查看其日志即可验证。</p>
+<h3 id="5-1-第一次请求接口"><a href="#5-1-第一次请求接口" class="headerlink" title="5.1. 第一次请求接口"></a>5.1. 第一次请求接口</h3><p>接口正常返回数据，日志如下：</p>
+<pre><code>2019-09-20 01:21:23.511  INFO 13548 --- [nio-8080-exec-1] c.c.d.e.service.impl.UserServiceImpl     : UserService#getById: id=1
+2019-09-20 01:21:23.544  INFO 13548 --- [nio-8080-exec-1] c.c.d.ehcache.repository.UserRepository  : UserRepository#getById: id=1
+2019-09-20 01:21:23.559  INFO 13548 --- [e [_default_]-0] c.c.d.ehcache.listener.CacheEventLogger  : cache event logger: type=CREATED, key=1, oldValue=null, newValue=User(id=1, name=Alice）</code></pre><p>第一行日志：接口执行到了 UserService 的 getById 方法。<br>第二行日志：接口执行到了 UserRepository 的 getById 方法。从而知道此次执行并未走缓存，因为我们是第一次请求，还没把数据写入缓存。<br>第三行日志：配置的 Listener 记录的日志，Ehcache 添加（CREATED）了缓存，key 为 1， oldValue 为 null， newValue 为 User(id=1, name=Alice）</p>
+<h3 id="5-2-第二次请求接口（与上一次间隔-TTL-以内）"><a href="#5-2-第二次请求接口（与上一次间隔-TTL-以内）" class="headerlink" title="5.2. 第二次请求接口（与上一次间隔 TTL 以内）"></a>5.2. 第二次请求接口（与上一次间隔 TTL 以内）</h3><p>接口正常返回数据，日志如下：</p>
+<pre><code>2019-09-20 01:24:46.441  INFO 13548 --- [io-8080-exec-10] c.c.d.e.service.impl.UserServiceImpl     : UserService#getById: id=1</code></pre><p>只有一行日志，表示执行到 UserService 的 getById 方法，并未执行到 UserRepository，说明缓存命中成功。</p>
+<h3 id="5-3-第三次请求（与上一次间隔超过-TTL）"><a href="#5-3-第三次请求（与上一次间隔超过-TTL）" class="headerlink" title="5.3. 第三次请求（与上一次间隔超过 TTL）"></a>5.3. 第三次请求（与上一次间隔超过 TTL）</h3><p>接口正常返回数据，日志如下：</p>
+<pre><code>2019-09-20 01:28:16.156  INFO 13548 --- [nio-8080-exec-6] c.c.d.e.service.impl.UserServiceImpl     : UserService#getById: id=1
+2019-09-20 01:28:16.161  INFO 13548 --- [nio-8080-exec-6] c.c.d.ehcache.repository.UserRepository  : UserRepository#getById: id=1
+2019-09-20 01:28:16.167  INFO 13548 --- [e [_default_]-2] c.c.d.ehcache.listener.CacheEventLogger  : cache event logger: type=EXPIRED, key=1, oldValue=User(id=1, name=Alice), newValue=null
+2019-09-20 01:28:16.169  INFO 13548 --- [e [_default_]-2] c.c.d.ehcache.listener.CacheEventLogger  : cache event logger: type=CREATED, key=1, oldValue=null, newValue=User(id=1, name=Alice）</code></pre><p>第一行日志：接口执行到了 UserService 的 getById 方法。<br>第二行日志：接口执行到了 UserRepository 的 getById 方法。从而知道此次执行并未走缓存。<br>第三行日志：缓存日志，检查到原来的缓存过期了，把缓存值更新为 null。<br>第四行日志：新添加了缓存值</p>
+<p>值得注意的是，这里是分了两步进行，先进行校验 TTL ，没过期则直接进行返回缓存数据，过期了则直接置为 null。然后又进行写入缓存数据。<br>所以我猜想，按照正常执行流程，这个日志应该是有一定的顺序错误，可能是因为异步任务造成。第二行和第三行应该进行替换。</p>
+<p>正确流程应该为：<br>1、先进行校验缓存值是否存在<br>2、如果缓存不存在，则直接进行查询。如果存在，则根据 TTL 校验缓存是否有效<br>3、如果有效，则直接返回。如果失效，则将缓存值置为 null，并进行查询，重新写入缓存</p>
+<p>知识有限，如有错误，欢迎留言指正。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.ehcache.org/" target="_blank" rel="noopener">http://www.ehcache.org</a><br><a href="https://github.com/ehcache" target="_blank" rel="noopener">ehcache github</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

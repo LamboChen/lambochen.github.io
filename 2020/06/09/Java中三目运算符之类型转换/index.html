@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            Java中三目运算符之类型转换
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 01:04&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/100498077" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/100498077</a></p>
+<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>相信各位 Javaer 对于三目运算符（三元运算符）都不陌生，较多情况下使用三目运算符即可节省一个 if-else 语句赋值的编写，笔者也是经常使用三目运算符，前段时间遇到了一点三目运算符的类型转换的坑，便在此记录一下。望更多的朋友能够避免，也加深我对三目运算符的理解。</p>
+<h1 id="2-三目运算符使用"><a href="#2-三目运算符使用" class="headerlink" title="2. 三目运算符使用"></a>2. 三目运算符使用</h1><p>闲话不说，直接上代码。</p>
+<pre><code class="java">/**
+ * 三目运算符使用
+ */
+public void ternaryOperator() {
+    boolean switchLog = true;
+    // 基本类型
+    int intValue = switchLog ? 1 : 0;
+    // 引用类型
+    String strValue = switchLog ? &quot;true&quot; : &quot;false&quot;;
+}</code></pre>
+<p>三目运算符可表达为：布尔表达式 ？ 表达式1 ： 表达式2</p>
+<p>布尔表达式：其结果决定三目运算符的分支情况<br>表达式1：当布尔表达式为 true，则执行<br>表达式2：当布尔表达式为 false，则执行</p>
+<h1 id="3-类型转换"><a href="#3-类型转换" class="headerlink" title="3. 类型转换"></a>3. 类型转换</h1><p>在三目运算符的使用过程中，即支持基本类型，也支持引用类型。值得注意的一点是，引用类型为 null 时，也是支持给引用类型赋值的。</p>
+<p>特别的，我们关注到了基本类型和其封装类型，于是有了下述代码。</p>
+<pre><code class="java">@Test
+public void intInteger() {
+    boolean switchLog = true;
+    Integer oneExpre = null
+    Integer result = switchLog ? oneExpre : 0;
+    System.out.println(result);
+}</code></pre>
+<p>猜想下这个程序的 result 返回什么，是 null 么？为什么？</p>
+<p>试着运行下测试，发现得到以下报错：</p>
+<pre><code class="java">java.lang.NullPointerException
+    at club.chenlinghong.demo.ternaryoperator.TernaryOperatorDemo.intInteger(TernaryOperatorDemo.java:28)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke(Method.java:498)
+    at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+    at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+    at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+    at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+    at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+    at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+    at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+    at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+    at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+    at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+    at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+    at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+    at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+    at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+    at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68)
+    at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47)
+    at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242)
+    at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70</code></pre>
+<p>NPE，有意思，命名没有任何问题呀，就算是 switchLog 为 true 嘛，也就把 null 值赋给 result 嘛，这不科学。</p>
+<p>我们再来尝试下另外一种写法：</p>
+<pre><code class="java">@Test
+public void intInteger() {
+    boolean switchLog = true;
+    Integer oneExpre = null;
+    Integer result = switchLog ? oneExpre : new Integer(0);
+    System.out.println(result);
+}</code></pre>
+<p>再次执行，居然没报错。result 为 null。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190903084527864.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="3-1-尝试着分析一下"><a href="#3-1-尝试着分析一下" class="headerlink" title="3.1 尝试着分析一下"></a>3.1 尝试着分析一下</h3><p>报错的情况：</p>
+<p>这种情况下，“表达式1” 结果是 null，而“ 表达式2 ” 是基本类型。大胆猜想一下，当执行时，先执行 “表达式1” 的得到返回结果 null ，此时 null 是一个特殊的值，并不知道其“具体的类型”，然后尝试着和 “表达式2” 进行统一类型，发现 “表达式2” 是 int 类型，并进行强转或者封装类型转基本类型，报NPE。</p>
+<p>未报错的情况：</p>
+<p>和报错情况不同的是，“表达式2”本身就是 Integer 类型，封装类型本身支持 null 类型赋值，便省去了类型强转的步骤，则不报错。</p>
+<h1 id="4-结论与思考"><a href="#4-结论与思考" class="headerlink" title="4. 结论与思考"></a>4. 结论与思考</h1><p>这是一个有趣的实验，同时也是一个很坑的点。对于这些细枝末节的知识点（坑点），可能在平时学习和编码中都很少遇到，但是在遇到的时候，可能需要查很久很久的代码才能找到。</p>
+<p>注重知识点的累计，多一次在学习中踩坑，就少一次在生产上的事故，哈哈哈哈哈 ~ _ ~</p>
+<h1 id="5-源码"><a href="#5-源码" class="headerlink" title="5. 源码"></a>5. 源码</h1><p>Github链接，欢迎star,follow。</p>
+<p><a href="https://github.com/chenlinghong/demo-springboot" target="_blank" rel="noopener">demo-springboot</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/alinshen/article/details/71515443" target="_blank" rel="noopener">关于三元运算符的类型转换问题</a></p>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

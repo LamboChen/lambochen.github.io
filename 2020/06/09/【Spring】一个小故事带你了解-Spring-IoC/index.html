@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【Spring】一个小故事带你了解 Spring IoC
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 00:17&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/105303915" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/105303915</a></p>
+<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>本文参考 Spring 视频教程总结而来， 通过 小红同学 幻想自己是有车一族下班回家，简单抽象下 IoC 基本概念。</p>
+<h1 id="2-有车一族"><a href="#2-有车一族" class="headerlink" title="2. 有车一族"></a>2. 有车一族</h1><p>小红下了班，开着自己的 Audi ，左拐一下，右拐一下，就回家了，真是快活。</p>
+<p>咱们用代码来模拟一下：</p>
+<pre><code class="java">public class XiaoHong {
+    public void goHome() {
+        // 有一辆 Audi
+        Audi audi = new Audi();
+        audi.start(); // 启动
+        audi.turnLeft(); // 左拐一下
+        audi.turnRight(); // 右拐一下
+        audi.stop(); // 停车
+    }
+}</code></pre>
+<p>那么，咱们来分析分析，小红同学回家之路。 </p>
+<p>1、goHome 中 new Audi() 能表示小红同学有一辆 Audi 么？<br>2、小红同学，能够 new Audi() 么？ 一个人能造车么？<br>3、回家，是需要 Audi 么？还是需要 车？<br>4、如果小红，换车了，买了辆 Lamborghini ，咱们需要做什么样的更改？</p>
+<h1 id="3-程序员来凑凑热闹"><a href="#3-程序员来凑凑热闹" class="headerlink" title="3. 程序员来凑凑热闹"></a>3. 程序员来凑凑热闹</h1><p>针对上文讨论的 1234，咱们一一来探讨探讨。</p>
+<p>客官请看：</p>
+<pre><code class="java">public class XiaoHong {
+    private Audi audi; // 表示有一辆 Audi
+    // 构造方法传入，表示 小红 是有车一族
+    public XiaoHong(Audi audi) {
+        this.audi = audi;
+    }
+    public void goHome() {
+        audi.start(); // 启动
+        audi.turnLeft(); // 左拐一下
+        audi.turnRight(); // 右拐一下
+        audi.stop(); // 停车
+    }
+}</code></pre>
+<p>经程序员之手稍加修改， <code>private Audi audi;</code> 即可表明小红有一辆 Audi， 通过构造函数传入，表明了小红的人设就是有车一族（准确的说是有 Audi 车一族）。</p>
+<p>那么，3、4 问题呢？（莫慌莫慌，开发哥哥都是很忙了）</p>
+<p>。。。。。。。。。。。  隔了十天半个月 。。。</p>
+<p>开发哥哥又出来接活（改造）了。</p>
+<pre><code class="java">// Car.java
+public interface Car {
+    void start();
+    void turnLeft();
+    void turnRight();
+    void stop();
+}
+
+// Audi.java
+public class Audi implements Car {
+    @Override
+    public void start(){}
+    // 此处省略其他方法
+}
+
+// XiaoHong.java
+public class XiaoHong {
+    private Car car; // 表示有一辆车
+    // 构造方法传入，表示 小红 是有车一族
+    public XiaoHong(Car car) {
+        this.car = car;
+    }
+    public void goHome() {
+        car.start(); // 启动
+        car.turnLeft(); // 左拐一下
+        car.turnRight(); // 右拐一下
+        car.stop(); // 停车
+    }
+}</code></pre>
+<p>通过声明一个接口 <code>Car</code> 来声明 车 的行为，同时，<code>XiaoHong</code> 声明一个 <code>car</code> 的 feild 表明小红是有车一族（这里才是真正的有车一族）。</p>
+<p>在实例化小红（小红人设，说白了就是电影开拍了，找了演员了）的时候，传入 car 即可，这个 car， 不管是 Audi 还是 Lamborghini， 甚至是自行车，小红都能 <code>goHome</code>。</p>
+<p>代码示例：</p>
+<pre><code class="java">public void static main(String[] args) {
+    // 买车，一辆奥迪
+    Car audi = new Audi();
+    // 小红生来就是有车一族（没办法，f二代）
+    XiaoHong xiaohong = new XiaoHong(audi);
+    // 回家
+    xiaohong.goHome();
+}</code></pre>
+<p> 那么，3，4 问题也都解决了，3（需要的是车），4（换车了，就传入新的 car 的实现类即可）</p>
+<p>ok，全剧终。（其实，没完，中途，小红换车了，你懂的）</p>
+<h1 id="4-what？"><a href="#4-what？" class="headerlink" title="4. what？"></a>4. what？</h1><p>what？剧终了？小红剧照都还没看到呢？</p>
+<p>好吧，博主妥协了，决定，给你们谈谈小红的。。。春。。。。。哦不。。。。Spring 。。。。。</p>
+<p>听过 Spring 的人，应该都知道，IoC。</p>
+<p>IoC 意为控制反转？那么问题来了，控制什么？什么是反转？</p>
+<ul>
+<li>控制： 对 Java Bean 对象的生命周期的控制（小红 这个人设在电影的生老病死）</li>
+<li>反转： 把 控制权 从 使用者（调用者）的反转交给 Spring Bean 容器来管理</li>
+</ul>
+<p>回想一下。最开始的时候，小红自己管理 Audi 的创建，销毁（当然，Java 交给了 GC）。 用代码来表示是这样的：</p>
+<pre><code class="java">public class XiaoHong {
+    public void goHome() {
+        // 有一辆 Audi
+        Audi audi = new Audi();
+        // 省略其他代码
+    }
+}</code></pre>
+<p>然后，咱们把对象的创建、销毁（控制权）交给 Spring Bean 容器管理【控制反转】。同时，咱们抽象了下，把 Audi 抽象为 Car，用代码表示是这样的：</p>
+<pre><code class="java">public class XiaoHong {
+    private Car car; // 表示有一辆车
+    // 构造方法传入，表示 小红 是有车一族 【这里采用的是构造器注入，Spring 还提供了其他方式，这里仅作示例】
+    public XiaoHong(Car car) {
+        this.car = car;
+    }
+    // 省略其他代码
+}</code></pre>
+<p>什么叫做交给 Spring Bean 容器管理呢？ Car 这个类，不是由小红来创建的，而是 Spring 创建扔 bean 容器中，实例化小红（小红用车）的时候，就直接从 bean 容器获取即可。</p>
+<p>四不四，一下子就明白了 Spring IoC 控制反转 的意思了哇？很清晰，很明白对不对？</p>
+<p>没有明白？好吧，那请移步 ~ _ ~</p>
+<ul>
+<li><a href="https://www.springcloud.cc/spring-reference.html" target="_blank" rel="noopener">Spring官方文档中文版</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>

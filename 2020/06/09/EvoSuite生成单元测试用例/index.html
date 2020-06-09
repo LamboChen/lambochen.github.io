@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            EvoSuite生成单元测试用例
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 01:01&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 19:02
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家： <a href="https://blog.csdn.net/chensanwa/article/details/100689019" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/100689019</a></p>
+<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>闲话少说，直接上干货。</p>
+<p>EvoSuite 官网：<a href="http://www.evosuite.org" target="_blank" rel="noopener">http://www.evosuite.org</a><br>开源代码：<a href="https://github.com/chenlinghong/evosuite" target="_blank" rel="noopener">https://github.com/chenlinghong/evosuite</a></p>
+<h1 id="2-maven-使用"><a href="#2-maven-使用" class="headerlink" title="2. maven 使用"></a>2. maven 使用</h1><p>1、引入 maven 插件</p>
+<pre><code class="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.evosuite.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;evosuite-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;${evosuite.version}&lt;/version&gt;
+&lt;/plugin&gt;</code></pre>
+<p>其中，evosuite.version 建议查询官网最新版本。</p>
+<p>2、引入evosuite依赖</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.evosuite&lt;/groupId&gt;
+    &lt;artifactId&gt;evosuite-standalone-runtime&lt;/artifactId&gt;
+    &lt;version&gt;${evosuite.version}&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+<p>3、编写测试方法</p>
+<pre><code class="java">public String evosuite(int id, String name) {
+    if (id == 0 &amp;&amp; &quot;name&quot;.equals(name)) {
+        return &quot;0#name&quot;;
+    }
+    if (id &gt; 0) {
+        name = &quot;name 1&quot;;
+    } else {
+        name = &quot;name -1&quot;;
+    }
+    return &quot;0#&quot; + name;
+}</code></pre>
+<p>4、执行命令生成测试用例</p>
+<pre><code class="shell">mvn  compile  evosuite:generate  -Dcores=4  -DmemoryInMB=8000  -DtimeInMinutesPerClass=3  -DspawnManagerPort=63040  -Dcuts=club.chenlinghong.dem.evosuite.EvosuiteDemo  evosuite:export  -DtargetFolder=src/test/java/evo</code></pre>
+<p>主要参数说明：</p>
+<p>evosuite:generate 生成测试用例，默认路径为根目录下  .evosuite 文件夹下 best-tests</p>
+<p>cores: 分配 CPU 核数，可以理解为任务进程数</p>
+<p>memoryInMB： 分配内存空间</p>
+<p>cuts: 需要生成单元测试的源代码，不填默认整个项目</p>
+<p>evosuite:export 导出文件</p>
+<p>targetFolder 目标路径</p>
+<p>如果是生成整个项目测试用例代码，直接运行：</p>
+<pre><code class="shell">mvn evosuite:generate</code></pre>
+<p>5、查看生成的测试用例</p>
+<p>根据命令指定的目录下，即可生成测试用例代码</p>
+<pre><code class="java">@RunWith(EvoRunner.class)
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
+public class EvosuiteDemo_ESTest extends club.chenlinghong.demo.evosuite.EvosuiteDemo_ESTest_scaffolding {
+
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      EvosuiteDemo evosuiteDemo0 = new EvosuiteDemo();
+      String string0 = evosuiteDemo0.evosuite((-803), &quot;&quot;);
+      assertEquals(&quot;0#name -1&quot;, string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      EvosuiteDemo evosuiteDemo0 = new EvosuiteDemo();
+      String string0 = evosuiteDemo0.evosuite(0, &quot;oame&quot;);
+      assertEquals(&quot;0#name -1&quot;, string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      EvosuiteDemo evosuiteDemo0 = new EvosuiteDemo();
+      String string0 = evosuiteDemo0.evosuite(0, &quot;name&quot;);
+      assertEquals(&quot;0#name&quot;, string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      EvosuiteDemo evosuiteDemo0 = new EvosuiteDemo();
+      String string0 = evosuiteDemo0.evosuite(343, &quot;0#name&quot;);
+      assertEquals(&quot;0#name 1&quot;, string0);
+  }
+}</code></pre>
+<p>可以看到，生成的测试用例代码满足 Junit 规范，并采用了 Mockito 框架进行 mock数据。</p>
+<h1 id="3-Intellij-IDEA-插件"><a href="#3-Intellij-IDEA-插件" class="headerlink" title="3. Intellij IDEA 插件"></a>3. Intellij IDEA 插件</h1><p>evosuite 支持 IDEA 插件直接生成测试用例代码</p>
+<p>1、安装 EvoSuite Plugin</p>
+<p>2、重启 IDEA</p>
+<p>3、执行代码</p>
+<p>找到任意一个 java 文件，然后右键，即可看到 Run EvoSuite</p>
+<p><img src="https://img-blog.csdnimg.cn/20190910102348511.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>点击即可看到参数选项，配置上刚才所说的几个参数即可：</p>
+<p><img src="https://img-blog.csdnimg.cn/20190910102442328.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NoZW5zYW53YQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://zhuanlan.zhihu.com/p/52663136" target="_blank" rel="noopener">测者的测试技术手册：自动化的自动化EvoSuite：Maven项目集成EvoSuite实战</a></li>
+</ul>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
