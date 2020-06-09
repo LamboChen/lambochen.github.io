@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        LamboChen&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="/css/style/github.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div class="container">
+        <div class="header">
+    <!-- <div class="logo">
+        <a href="/">LamboChen&#39;s Blog</a>
+    </div> -->
+    <div class="logo">
+        <img src="/images/logo.png" alt="Logo">
+    </div>
+    <div class="nav">
+        <ul class="menu">
+            
+                <li class="menu-item">
+                    <a href="/" class="menu-item-link">
+                        Home
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://github.com/LamboChen" target="_blank" rel="noopener" class="menu-item-link">
+                        Github
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a href="https://blog.csdn.net/chensanwa" target="_blank" rel="noopener" class="menu-item-link">
+                        CSDN
+                    </a>
+                </li>
+                
+        </ul>
+    </div>
+</div>
+        <div class="article">
+    <!-- <div class="article-title">
+        <h2>
+            【译】5 Different Ways to Create Objects in Java
+        </h2>
+    </div> -->
+    <div class="article-meta">
+        <div class="article-date">
+            <i class="fas fa-edit"></i>
+            2020/06/09 Tue 21:29&nbsp;&nbsp;&nbsp;
+            <span class="just-a-temp"><span>
+            <i class="fas fa-redo"></i>
+            2020/06/09 Tue 21:30
+        </div>
+    </div>
+    <div class="article-content">
+        <p>博客搬家：<a href="https://blog.csdn.net/chensanwa/article/details/99618347" target="_blank" rel="noopener">https://blog.csdn.net/chensanwa/article/details/99618347</a></p>
+<p>原文章链接： <a href="https://dzone.com/articles/5-different-ways-to-create-objects-in-java-with-ex" target="_blank" rel="noopener">https://dzone.com/articles/5-different-ways-to-create-objects-in-java-with-ex</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Rambo（小编）最近开始学习新的领域——技术文章“英译中”，这是Rambo的开篇文章，希望以后能够多多的去学习、翻译、搬运优质文章。初学翻译，加上自身技术能力有限，翻译的有偏差，还望评论指出，我们相互探讨出更合适、贴切、专业的译文。</p>
+<p>在翻译的路上了，我是个小白。在技术的路上呢，我更是个小白。所以在翻译文章中，“信”是基础，力在追求“达”，不敢妄谈“雅”。</p>
+<p>PS：以下为正文</p>
+<hr>
+<hr>
+<h1><center>Java中创建对象的5种方法</center></h1>
+---
+_将会列举5种方法去创建 Java 对象，以及他们如何与构造函数交互，并且会有介绍如何去使用这些方法的示例。_
+
+<p>作为一个 Java 开发人员，我们每天都会创建大量的 Java 对象，但是我们通常会使用依赖管理系统去创建这些对象，例如 Spring 。然而，我们可以有更多的方式去创建对象，让我们一起在文章中去学习这些方法吧。</p>
+<p>这里列举在 Java 中创建对象的五种方式，下面将介绍它们的示例，以及创建对象的行的字节码。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用 new 关键字</td>
+<td>构造函数会被调用</td>
+</tr>
+<tr>
+<td>使用 Class 类的 newInstance()</td>
+<td>构造函数会被调用</td>
+</tr>
+<tr>
+<td>使用 Constructor 类的 newInstance()</td>
+<td>构造函数会被调用</td>
+</tr>
+<tr>
+<td>使用 clone() 方法</td>
+<td>无构造函数调用</td>
+</tr>
+<tr>
+<td>使用 deserialization</td>
+<td>无构造函数调用</td>
+</tr>
+</tbody></table>
+<p>如果最后执行给定的程序，您将看到方法1、2、3使用构造函数创建对象，而4、5不调用构造函数创建对象。</p>
+<h1 id="1、使用-new-关键字"><a href="#1、使用-new-关键字" class="headerlink" title="1、使用 new 关键字"></a>1、使用 new 关键字</h1><p>这是创建一个对象最通用、常规的方法，同时也是最简单的方式。通过使用此方法，我们可以调用任何要调用的构造函数（默认使用无参构造函数）。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td align="left">Employee</td>
+</tr>
+<tr>
+<td>1<br> 2<br>3</td>
+<td align="left">0:new  #19   // class org/programming/mitra/exercises/Employe <br>3:dup<br> 4: invokespecial #21          // Method org/programming/mitra/exercises/Employee.””: ()V</td>
+</tr>
+</tbody></table>
+<h1 id="2、使用-Class-类的-newInstance"><a href="#2、使用-Class-类的-newInstance" class="headerlink" title="2、使用 Class 类的 newInstance()"></a>2、使用 Class 类的 newInstance()</h1><p>我们能够使用 Class 类的 newInstance() 方法创建对象。这个 newInstance() 方法将调用无参构造方法去创建一个对象。</p>
+<p>在下述代码中，我们通过调用 newInstance() 去创建一个对象：</p>
+<pre><code class="java">Employee emp2 = (Employee) Class.forName(&quot;org.programming.mitra.exercises.Employee&quot;).newInstance();</code></pre>
+<p>或者：<br>| | |<br>| — | :- |<br>| 1 | Employee emp2 = Employee.class.newInstance();|<br>| 1  | 51: invokevirtual    #70    // Method java/lang/Class.newInstance:()Ljava/lang/Object; |</p>
+<h1 id="3、使用-Constructor-类的-newInstance"><a href="#3、使用-Constructor-类的-newInstance" class="headerlink" title="3、使用 Constructor 类的 newInstance()"></a>3、使用 Constructor 类的 newInstance()</h1><p>与 Class 类中的 newInstance() 方法相似，在此我们将使用 java.lang.reflect.Constructor 类中的 newInstance() 方法创建对象。通过使用这个 newInstance() 方法我们能够调用有参构造函数和私有构造函数。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1<br>2</td>
+<td align="left">Constructor<Employee> constructor = Employee.class.getConstructor();<br>Employee emp3 = constructor.newInstance();</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="left">111: invokevirtual  #80  // Method java/lang/reflect/Constructor.newInstance:([Ljava/lang/Object;)Ljava/lang/Object;</td>
+</tr>
+</tbody></table>
+<p>这两个 newInstance() 方法都被称为创建对象的反射方法。实际上， Class 类的 newInstance() 方法内部使用 Constructor 类的 newInstance() 方法。这就是为什么后者更受欢迎，并且也被 Spring、Hibernate、Structs 等不同的框架所使用的原因。更多关于上述两个 newInstance() 方法的区别请阅读 <a href="https://programmingmitra.blogspot.in/2016/05/creating-objects-through-reflection-in-java-with-example.html" target="_blank" rel="noopener">Creating objects through Reflection in Java with Example</a>。</p>
+<h1 id="4、使用-Clone-方法"><a href="#4、使用-Clone-方法" class="headerlink" title="4、使用 Clone() 方法"></a>4、使用 Clone() 方法</h1><p>每当我们对任何对象调用 clone() 时，jvm 都会为我们创建一个新对象，并将前一个对象的所有内容复制到其中。使用 clone 方法创建对象不会调用任何构造函数。</p>
+<p>要在对象上使用 clone() 方法，我们需要实现 Cloneable 并在其中定义 clone() 方法。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td align="left">Employee emp4 = (Employee) emp3.clone();</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="left">162: invokevirtual #87  // Method org/programming/mitra/exercises/Employee.clone ()Ljava/lang/Object;</td>
+</tr>
+</tbody></table>
+<p>Java 克隆是 Java 社区中最有争议的话题，它确实有它的缺点，但仍然是创建任何对象副本的最流行和最简单的方法，直到该对象完全填充 Java 克隆的强制条件。我在3篇长的<a href="https://programmingmitra.blogspot.in/search/label/Java%20Cloning" target="_blank" rel="noopener"> Java Cloning Series </a>中详细介绍了克隆，其中包括（<a href="https://programmingmitra.blogspot.in/2016/11/Java-Cloning-Types-of-Cloning-Shallow-Deep-in-Details-with-Example.html" target="_blank" rel="noopener">Java Cloning And Types Of Cloning (Shallow And Deep) In Details With Example</a>，<a href="https://programmingmitra.blogspot.in/2017/01/Java-cloning-copy-constructor-versus-Object-clone-or-cloning.html" target="_blank" rel="noopener"> Java Cloning - Copy Constructor Versus Cloning</a>，<a href="https://programmingmitra.blogspot.in/2017/01/java-cloning-why-copy-constructors-are-not-sufficient-or-good.html" target="_blank" rel="noopener"> Java Cloning - Even Copy Constructors Are Not Sufficient</a>），如果你想了解更多关于克隆的知识,请继续阅读它们。</p>
+<h1 id="5、使用-deserialization"><a href="#5、使用-deserialization" class="headerlink" title="5、使用 deserialization"></a>5、使用 deserialization</h1><p>每当我们序列化和反序列化对象时，JVM会为我们创建了一个独立的对象。在 deserialization 中，JVM 不使用任何构造函数来创建对象。</p>
+<p>对于序列化对象，我们需要在类中实现 Serializable 接口。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1<br>2</td>
+<td align="left">ObjectInputStream in = new ObjectInputStream(new FileInputStream(“data.obj”));<br>Employee emp5 = (Employee) in.readObject();</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="left">261: invokevirtual  #118   // Method java/io/ObjectInputStream.readObject:()Ljava/lang/Object;</td>
+</tr>
+</tbody></table>
+<p>正如我们在上面的字节码片段中看到的，4个方法都被调用并转换为 invokevirtual（对象创建由这些方法直接处理），但第一个方法被转换为两个调用：一个是 new，另一个是 invokespecial（调用构造函数）。</p>
+<p>在我的文章中，曾经讨论过序列化和反序列化的细节，如果你想了解更多相关知识，请继续阅读：<a href="https://www.programmingmitra.com/2019/08/what-is-serialization-everything-about-java-serialization-explained-with-example.html" target="_blank" rel="noopener">Everything About Java Serialization Explained With Example</a>。</p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>创建对象的 Employee 类：</p>
+<pre><code class="java">class Employee implements Cloneable, Serializable 
+
+    private static final long serialVersionUID = 1L;
+
+    private String name    
+
+    public Employee() {
+        System.out.println(&quot;Employee Constructor Called...&quot;);
+    ｝   
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    ｝
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Employee other = (Employee) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    ｝    
+
+    @Override
+    public String toString() {
+        return &quot;Employee [name=&quot; + name + &quot;]&quot;;
+    ｝  
+
+    @Override
+    public Object clone() {
+        Object obj = null;
+        try {
+            obj = super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+}</code></pre>
+<p>在下面的 Java 程序中，我们将以5种方式创建 Employee 对象。您也可以在<a href="https://github.com/njnareshjoshi/exercises/tree/master/src/org/programming/mitra/exercises" target="_blank" rel="noopener">GitHub</a>上找到源代码。</p>
+<pre><code class="java">public class ObjectCreation {
+    public static void main(String... args) throws Exception {
+
+  　　   // By using new keyword
+        Employee emp1 = new Employee();
+        emp1.setName(&quot;Naresh&quot;);
+
+        System.out.println(emp1 + &quot;, hashcode : &quot; + emp1.hashCode());
+
+        // By using Class class&#39;s newInstance() method
+        Employee emp2 = (Employee) Class.forName(&quot;org.programming.mitra.exercises.Employee&quot;)
+                               .newInstance();
+
+        // Or we can simply do this
+        // Employee emp2 = Employee.class.newInstance();
+        emp2.setName(&quot;Rishi&quot;);
+        System.out.println(emp2 + &quot;, hashcode : &quot; + emp2.hashCode());
+
+        // By using Constructor class&#39;s newInstance() method
+        Constructor&lt;Employee&gt; constructor = Employee.class.getConstructor();
+        Employee emp3 = constructor.newInstance();
+        emp3.setName(&quot;Yogesh&quot;);
+        System.out.println(emp3 + &quot;, hashcode : &quot; + emp3.hashCode());
+
+        // By using clone() method
+        Employee emp4 = (Employee) emp3.clone();
+        emp4.setName(&quot;Atul&quot;);
+        System.out.println(emp4 + &quot;, hashcode : &quot; + emp4.hashCode());
+
+        // By using Deserialization
+        // Serialization
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(&quot;data.obj&quot;));
+        out.writeObject(emp4);
+        out.close();
+
+        //Deserialization
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(&quot;data.obj&quot;));
+        Employee emp5 = (Employee) in.readObject();
+        in.close();
+        emp5.setName(&quot;Akash&quot;);
+        System.out.println(emp5 + &quot;, hashcode : &quot; + emp5.hashCode());
+    }
+}</code></pre>
+<p>此程序执行将有以下输出：</p>
+<pre><code>Employee Constructor Called...
+Employee [name=Naresh], hashcode : -1968815046
+Employee Constructor Called...
+Employee [name=Rishi], hashcode : 78970652
+Employee Constructor Called...
+Employee [name=Yogesh], hashcode : -1641292792
+Employee [name=Atul], hashcode : 2051657
+Employee [name=Akash], hashcode : 63313419</code></pre><blockquote>
+<p>原文：<a href="https://dzone.com/articles/5-different-ways-to-create-objects-in-java-with-ex" target="_blank" rel="noopener">https://dzone.com/articles/5-different-ways-to-create-objects-in-java-with-ex</a><br>作者：Naresh Joshi<br>译者：陈苓洪</p>
+</blockquote>
+
+    </div>
+
+    <div class="totop">ToTOP</div>
+</div>
+        <div class="footer">
+    <a href="#">
+        2018 <i class="fab fa-studiovinari"></i> Lambo Chen <i class="fas fa-angle-double-up"></i>
+    </a>
+</div>
+
+
+<script src="/js/totop.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+    </div>
+</body>
+
+</html>
